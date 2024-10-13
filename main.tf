@@ -12,3 +12,13 @@ module "s3" {
     source = "./modules/s3"
     bucket_name = "evengod-cloud"
 }
+
+module "security_groups" {
+  source = "./modules/security-groups"
+
+  lambda_sg_name   = "lambda-sg"
+  rdsproxy_sg_name = "rdsproxy-sg"
+  mysql_sg_name    = "mysql-sg"
+  vpc_id           = module.vpc.id 
+
+}
