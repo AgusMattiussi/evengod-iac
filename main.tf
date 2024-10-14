@@ -1,16 +1,16 @@
 module "vpc" {
-    source     = "./modules/vpc"
+  source     = "./modules/vpc"
     
-    cidr_block = "10.0.0.0/16"
-    name       = "evengod-vpc"
+  cidr_block = "10.0.0.0/16"
+  name       = "evengod-vpc"
 
-    availability_zones = ["us-east-1a", "us-east-1b"]
-    private_subnet_cidrs = ["10.0.1.0/24", "10.0.2.0/24", "10.0.3.0/24", "10.0.4.0/24"]
+  availability_zones = ["us-east-1a", "us-east-1b"]
+  private_subnet_cidrs = ["10.0.1.0/24", "10.0.2.0/24", "10.0.3.0/24", "10.0.4.0/24"]
 }
 
 module "s3" {
-    source = "./modules/s3"
-    bucket_name = "evengod-cloud"
+  source = "./modules/s3"
+  bucket_name = "evengod-cloud"
 }
 
 module "security_groups" {
@@ -24,18 +24,21 @@ module "security_groups" {
 }
 
 data "aws_subnets" "rds_subnets" {
-    filter {
-      name   = "vpc-id"
-      values = [module.vpc.id]
-    }
+  depends_on = [module.vpc]
 
-    filter {
-      name   = "cidr-block"
-      values = ["10.0.3.0/24", "10.0.4.0/24"]
-    }
+  filter {
+    name   = "vpc-id"
+    values = [module.vpc.id]
+  }
+
+  filter {
+    name   = "cidr-block"
+    values = ["10.0.3.0/24", "10.0.4.0/24"]
+  }
 }
 
 module "rds_mysql" {
+  depends_on = [module.vpc, module.security_groups]
   source = "./modules/rds"
 
   name                   = "evengod-db"
