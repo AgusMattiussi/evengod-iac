@@ -19,3 +19,20 @@ module "private_subnet" {
     subnet_cidr       = var.private_subnet_cidrs[count.index]
     name              = "private-subnet-${count.index + 1}"
 }
+
+resource "aws_route_table" "private" {
+  count = length(var.private_subnet_cidrs)
+
+  vpc_id = aws_vpc.this.id
+
+  tags = {
+    Name = "evengod-rt-private${count.index + 1}-${var.availability_zones[count.index % 2]}"
+  }
+}
+
+resource "aws_route_table_association" "private" {
+  count = length(var.private_subnet_cidrs)
+
+  subnet_id      = module.private_subnet[count.index].id
+  route_table_id = aws_route_table.private[count.index % length(var.availability_zones)].id
+}
