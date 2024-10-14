@@ -22,3 +22,30 @@ module "security_groups" {
   vpc_id           = module.vpc.id 
 
 }
+
+data "aws_subnets" "rds_subnets" {
+    filter {
+      name   = "vpc-id"
+      values = [module.vpc.id]
+    }
+
+    filter {
+      name   = "cidr-block"
+      values = ["10.0.3.0/24", "10.0.4.0/24"]
+    }
+}
+
+module "rds_mysql" {
+  source = "./modules/rds"
+
+  name                   = "evengod-db"
+  instance_class         = "db.t4g.micro"
+  engine_version         = "8.0.35"
+  db_identifier          = "evengod-db"
+  db_name                = "evengoddb"
+  username               = "admin" # TODO: use secrets manager
+  password               = "admin123"
+
+  subnet_ids            = data.aws_subnets.rds_subnets.ids
+  vpc_security_group_ids = [module.security_groups.mysql_sg_id]
+}
