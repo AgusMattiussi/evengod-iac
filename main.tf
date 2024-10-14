@@ -8,9 +8,16 @@ module "vpc" {
   private_subnet_cidrs = ["10.0.1.0/24", "10.0.2.0/24", "10.0.3.0/24", "10.0.4.0/24"]
 }
 
-module "s3" {
+module "s3_frontend" {
   source = "./modules/s3"
-  bucket_name = "evengod-cloud"
+  bucket_name = "evengod-frontend"
+  is_website = true
+}
+
+module "s3_images" {
+  source = "./modules/s3"
+  bucket_name = "evengod-images"
+  is_website = false
 }
 
 module "security_groups" {
