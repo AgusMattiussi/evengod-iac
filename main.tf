@@ -2,25 +2,14 @@
 module "vpc" {
   source     = "./modules/vpc"
     
-  cidr_block = "10.0.0.0/16"
-  name       = "evengod-vpc"
+  cidr_block = var.cidr_block
+  name       = var.vpc_name
 
-  availability_zones = ["us-east-1a", "us-east-1b"]
-  private_subnet_cidrs = ["10.0.1.0/24", "10.0.2.0/24", "10.0.3.0/24", "10.0.4.0/24"]
+  availability_zones = var.availability_zones
+  private_subnet_cidrs = var.private_subnet_cidrs
 }
 
 # ================= VPC Endpoints =================
-data "aws_route_tables" "private_route_tables" {
-  filter {
-    name   = "vpc-id"
-    values = [module.vpc.id]
-  }
-
-  filter {
-    name   = "tag:Name"
-    values = ["*private*"]
-  }
-}
 
 module "vpc_endpoints" {
   depends_on = [module.vpc]
@@ -46,7 +35,7 @@ module "vpc_endpoints" {
         ]
      })
      tags = {
-        Name = "s3-images-vpc-endpoint"
+        Name = var.vpc_endpoint_s3_name
      }
     }
   }
@@ -55,13 +44,13 @@ module "vpc_endpoints" {
 # ================= S3 Buckets =================
 module "s3_frontend" {
   source      = "./modules/s3"
-  bucket_name = "evengod-frontend"
+  bucket_name = var.frontend_bucket_name
   is_website  = true
 }
 
 module "s3_images" {
   source      = "./modules/s3"
-  bucket_name = "evengod-images"
+  bucket_name = var.images_bucket_name
   is_website  = false
 }
 
@@ -69,39 +58,23 @@ module "s3_images" {
 module "security_groups" {
   source = "./modules/security-groups"
 
-  lambda_sg_name   = "lambda-sg"
-  rdsproxy_sg_name = "rdsproxy-sg"
-  mysql_sg_name    = "mysql-sg"
+  lambda_sg_name   = var.lambda_sg_name
+  rdsproxy_sg_name = var.rds_proxy_sg_name
+  mysql_sg_name    = var.my_sql_sg_name
   vpc_id           = module.vpc.id 
 
 }
 
 # ================= RDS MySQL =================
-data "aws_subnets" "rds_subnets" {
-  depends_on = [module.vpc]
-
-  filter {
-    name   = "vpc-id"
-    values = [module.vpc.id]
-  }
-
-  filter {
-    name   = "cidr-block"
-    values = ["10.0.3.0/24", "10.0.4.0/24"]
-  }
-}
-
 module "rds_mysql" {
   depends_on = [module.vpc, module.security_groups]
   source = "./modules/rds"
 
-  name                   = "evengod-db"
-  instance_class         = "db.t4g.micro"
-  engine_version         = "8.0.35"
-  db_identifier          = "evengod-db"
-  db_name                = "evengoddb"
-  username               = "admin" # TODO: use secrets manager
-  password               = "admin123"
+  name                   = var.rds_db_identifier
+  db_identifier          = var.rds_db_identifier
+  db_name                = var.rds_db_name
+  username               = var.rds_db_username
+  password               = var.rds_db_password
 
   subnet_ids             = data.aws_subnets.rds_subnets.ids
   vpc_security_group_ids = [module.security_groups.mysql_sg_id]

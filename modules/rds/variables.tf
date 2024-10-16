@@ -18,7 +18,7 @@ variable "instance_class" {
 variable "engine_version" {
   description = "Engine version for the RDS instance"
   type        = string
-  default     = "8.0"
+  default     = "8.0.35"
 }
 
 variable "db_identifier" {
