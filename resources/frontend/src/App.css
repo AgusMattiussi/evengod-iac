@@ -1,0 +1,59 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Estilos generales */
+:root {
+  --primary-color: #3d5a80;
+  --text-color: #ffffff;
+  --background-color: #293241;
+  --secondary-background: #3b4452;
+  --hover-color: #4f698c;
+}
+
+body {
+  font-family: "Roboto", sans-serif;
+  background: hsla(218, 23%, 21%, 1);
+  color: var(--text-color);
+  line-height: 1.6;
+  margin: 0;
+}
+
+.app {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+.main-container {
+  display: flex;
+}
+
+.content-area {
+  flex-grow: 1;
+  padding: 20px;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+  .header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  nav ul {
+    margin-top: 1rem;
+  }
+
+  .user-info {
+    margin-top: 1rem;
+  }
+
+  .filters {
+    justify-content: center;
+  }
+
+  .event-card {
+    min-width: 150px;
+  }
+}

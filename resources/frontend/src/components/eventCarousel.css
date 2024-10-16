@@ -1,0 +1,18 @@
+/* EventCarousel.css */
+.event-carousel {
+  margin-bottom: 2rem;
+}
+
+.event-carousel h2 {
+  margin-bottom: 1rem;
+  font-size: 1.5rem;
+}
+
+.carousel-container {
+  display: flex;
+  /* overflow-x: auto; */
+  overflow: hidden;
+  position: relative;
+  gap: 1rem;
+  padding-bottom: 1rem;
+}

@@ -1,0 +1,84 @@
+/* Filters.css */
+.filter-section {
+  width: 200px;
+  padding: 20px;
+}
+
+.filter-box {
+  margin-bottom: 30px;
+}
+
+h2 {
+  margin-top: 0;
+  margin-bottom: 10px;
+  color: var(--text-color);
+}
+
+h3 {
+  margin-top: 0;
+  margin-bottom: 5px;
+  color: var(--text-color);
+}
+
+ul {
+  list-style-type: none;
+  margin: 0;
+  padding: 0;
+}
+
+li {
+  margin-top: 0;
+  margin-bottom: 10px;
+}
+
+label {
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+}
+
+input[type="checkbox"],
+input[type="radio"] {
+  margin-right: 10px;
+}
+
+input[type="date"],
+input[type="text"] {
+  width: 165px;
+  padding: 8px;
+  margin-top: 5px;
+  border: 1px solid var(--secondary-background);
+  background-color: var(--background-color);
+  color: var(--text-color);
+}
+
+.apply-filters {
+  display: block;
+  width: 165px;
+  padding: 10px;
+  margin-top: 20px;
+  background-color: var(--primary-color);
+  color: white;
+  border: none;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.apply-filters:hover {
+  background-color: var(--hover-color);
+}
+
+.clear-filters {
+  display: block;
+  width: 140px;
+  padding: 10px;
+  margin: 10px 0 0 15px;
+  color: white;
+  border: none;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.clear-filters:hover {
+  background-color: var(--hover-color);
+}
