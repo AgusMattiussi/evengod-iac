@@ -50,7 +50,6 @@ resource "aws_s3_bucket_policy" "frontend_bucket_policy" {
     })
 }
 
-# TODO: Upload the content of the website to the S3 bucket
 resource "null_resource" "frontend_build" {
   count = var.is_website ? 1 : 0
 
@@ -60,19 +59,18 @@ resource "null_resource" "frontend_build" {
   }
 }
 
-# resource "aws_s3_object" "file" {
-#     depends_on = [ null_resource.frontend_build ]
+resource "aws_s3_object" "file" {
+    depends_on = [ null_resource.frontend_build ]
 
-#     count        = var.is_website ? 1 : 0
-#     for_each = fileset(local.build_directory, "**")
+    for_each = var.is_website ? fileset(local.build_directory, "**") : toset([])
 
-#     bucket = aws_s3_bucket.bucket.id
-#     key    = each.value
-#     source = "${local.build_directory}/${each.value}"
-#     etag   = filemd5("${local.build_directory}/${each.value}")
+    bucket = aws_s3_bucket.bucket.id
+    key    = each.value
+    source = "${local.build_directory}/${each.value}"
+    etag   = filemd5("${local.build_directory}/${each.value}")
 
-#     content_type = lookup(local.mime_types, split(".", each.value)[1], "application/octet-stream")
-# }
+    content_type = lookup(local.mime_types, concat(regexall("([^\\.]*)$", each.value), [[""]])[0][0], "")
+}
 
 # ==================================== S3 Bucket For Images Configuration ====================================
 

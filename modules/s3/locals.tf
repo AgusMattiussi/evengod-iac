@@ -5,11 +5,12 @@ locals {
     mime_types = {
         "html" = "text/html",
         "css"  = "text/css",
-        "ico"  = "image/x-icon",
-        "js"   = "application/javascript",
+        "js"   = "text/javascript",
         "json" = "application/json",
         "png"  = "image/png",
         "jpg"  = "image/jpeg",
         "jpeg" = "image/jpeg",
+        "ico"  = "image/vnd.microsoft.icon",
+        "txt"  = "text/plain",
   }
 }
