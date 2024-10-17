@@ -79,3 +79,9 @@ module "rds_mysql" {
   subnet_ids             = data.aws_subnets.rds_subnets.ids
   vpc_security_group_ids = [module.security_groups.mysql_sg_id]
 }
+
+
+# ================ Cognito =====================
+module "cognito"{
+  source = "./modules/cognito"
+}
