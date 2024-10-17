@@ -5,6 +5,8 @@ build
 # Ignore .zip files
 *.zip
 
+# allow lambda_layer.zip
+!lambda_layer.zip
 
 ### Terraform ###
 # Local .terraform directories
