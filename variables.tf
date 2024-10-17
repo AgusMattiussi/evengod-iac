@@ -67,3 +67,13 @@ variable "vpc_endpoint_s3_name" {
   description = "Name of the VPC endpoint for S3"
   type        = string
 }
+
+variable "lambda_functions" {
+  description = "List of Lambda functions to deploy"
+  type        = list(Object({
+    name    = string
+    handler = string
+    runtime = string
+    source_dir = string
+  }))
+}

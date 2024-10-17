@@ -1,11 +1,11 @@
 # ================= VPC =================
 module "vpc" {
-  source     = "./modules/vpc"
-    
+  source = "./modules/vpc"
+
   cidr_block = var.cidr_block
   name       = var.vpc_name
 
-  availability_zones = var.availability_zones
+  availability_zones   = var.availability_zones
   private_subnet_cidrs = var.private_subnet_cidrs
 }
 
@@ -20,23 +20,23 @@ module "vpc_endpoints" {
 
   endpoints = {
     s3 = {
-      service             = "s3"
-      service_type        = "Gateway"
-      route_table_ids     = data.aws_route_tables.private_route_tables.ids
+      service         = "s3"
+      service_type    = "Gateway"
+      route_table_ids = data.aws_route_tables.private_route_tables.ids
       policy = jsonencode({
         Version = "2008-10-17"
         Statement = [
-        {
+          {
             "Effect" : "Allow",
             "Principal" : "*",
             "Action" : "*",
             "Resource" : "*"
-        }
+          }
         ]
-     })
-     tags = {
+      })
+      tags = {
         Name = var.vpc_endpoint_s3_name
-     }
+      }
     }
   }
 }
@@ -61,20 +61,20 @@ module "security_groups" {
   lambda_sg_name   = var.lambda_sg_name
   rdsproxy_sg_name = var.rds_proxy_sg_name
   mysql_sg_name    = var.my_sql_sg_name
-  vpc_id           = module.vpc.id 
+  vpc_id           = module.vpc.id
 
 }
 
 # ================= RDS MySQL =================
 module "rds_mysql" {
   depends_on = [module.vpc, module.security_groups]
-  source = "./modules/rds"
+  source     = "./modules/rds"
 
-  name                   = var.rds_db_identifier
-  db_identifier          = var.rds_db_identifier
-  db_name                = var.rds_db_name
-  username               = var.rds_db_username
-  password               = var.rds_db_password
+  name          = var.rds_db_identifier
+  db_identifier = var.rds_db_identifier
+  db_name       = var.rds_db_name
+  username      = var.rds_db_username
+  password      = var.rds_db_password
 
   subnet_ids             = data.aws_subnets.rds_subnets.ids
   vpc_security_group_ids = [module.security_groups.mysql_sg_id]
@@ -84,4 +84,38 @@ module "rds_mysql" {
 # ================ Cognito =====================
 module "cognito"{
   source = "./modules/cognito"
+}
+
+
+# ================= Lambda layer =================
+resource "aws_lambda_layer_version" "mysql_dependencies" {
+  filename   = "${path.module}/lambda_layer.zip"
+  layer_name = "mysql-dependencies"
+
+  compatible_runtimes = ["nodejs18.x", "nodejs20.x"]
+
+  source_code_hash = filebase64sha256("${path.module}/lambda_layer.zip")
+}
+
+# ================= Lambda functions =================
+module "lambda_functions" {
+  source   = "./modules/lambda"
+  for_each = { for fn in var.lambda_functions : fn.name => fn }
+
+  function_name    = each.value.name
+  handler          = each.value.handler
+  runtime          = each.value.runtime
+  source_dir       = "${local.lambdas_dir}/${each.value.source_dir}"
+  role             = aws_iam_role.lambda_role.arn
+  layer_arn        = aws_lambda_layer_version.mysql_dependencies.arn
+  vpc_subnet_ids   = module.vpc.private_subnet_ids
+  vpc_security_group_ids = [module.security_groups.lambda_sg_id]
+
+  environment_variables = {
+    RDS_PROXY      = var.rds_proxy
+    DB_USERNAME    = var.db_username
+    DB_PASSWORD    = var.db_password
+    DB_NAME        = var.db_name
+    S3_BUCKET_NAME = var.s3_bucket_name
+  }
 }
