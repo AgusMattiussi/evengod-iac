@@ -24,11 +24,11 @@ resource "aws_s3_bucket_website_configuration" "hosting" {
     bucket = aws_s3_bucket.bucket.id
     
     index_document {
-        suffix = "index.html"
+        suffix = local.index_document
     }
 
       error_document {
-        key = "error.html"
+        key = local.error_document
     }
 }
 

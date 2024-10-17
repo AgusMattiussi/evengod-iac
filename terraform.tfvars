@@ -13,5 +13,9 @@ my_sql_sg_name = "mysql-sg"
 rds_db_identifier = "evengod-db"
 rds_db_name = "evengoddb"
 
+# Entendemos que estas credenciales no corresponde que sean pusheadas pero las agregamos al archivo .tfvars para simplificar el deploy
+rds_db_username = "admin"
+rds_db_password = "admin123"
+
 vpc_endpoint_s3_name = "s3-images-vpc-endpoint"
 

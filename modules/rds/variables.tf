@@ -3,6 +3,12 @@ variable "name" {
   type        = string
 }
 
+variable "engine" {
+  description = "Engine for the RDS instance"
+  type        = string
+  default     = "mysql"
+}
+
 variable "allocated_storage" {
   description = "Storage capacity for the RDS instance"
   type        = number
@@ -56,4 +62,22 @@ variable "multi_az" {
   description = "Enable Multi-AZ deployment"
   type        = bool
   default     = false
+}
+
+variable "port" {
+  description = "Port for the database"
+  type        = string
+  default     = "3306"
+}
+
+variable "storage_type" {
+  description = "Storage type for the RDS instance"
+  type        = string
+  default     = "gp3"
+}
+
+variable "backup_retention_period" {
+  description = "Backup retention period in days"
+  type        = number
+  default     = 1
 }

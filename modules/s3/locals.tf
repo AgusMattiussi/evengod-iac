@@ -13,4 +13,7 @@ locals {
         "ico"  = "image/vnd.microsoft.icon",
         "txt"  = "text/plain",
   }
+
+  index_document = "index.html"
+  error_document = "error.html"
 }

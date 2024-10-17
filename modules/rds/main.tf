@@ -4,7 +4,7 @@ resource "aws_db_subnet_group" "rds_subnet_group" {
 }
 
 resource "aws_db_instance" "mysql_rds" {
-  engine                  = "mysql"
+  engine                  = var.engine
   engine_version          = var.engine_version
 
   multi_az                = var.multi_az
@@ -15,7 +15,7 @@ resource "aws_db_instance" "mysql_rds" {
 
   instance_class          = var.instance_class
 
-  storage_type            = "gp3"
+  storage_type            = var.storage_type
   allocated_storage       = var.allocated_storage
 
   db_subnet_group_name    = aws_db_subnet_group.rds_subnet_group.name
@@ -24,11 +24,11 @@ resource "aws_db_instance" "mysql_rds" {
   vpc_security_group_ids  = var.vpc_security_group_ids
 
   db_name                 = var.db_name
-  port                    = "3306"
+  port                    = var.port
 
   storage_encrypted       = true
 
-  backup_retention_period = 1
+  backup_retention_period = var.backup_retention_period
 
   skip_final_snapshot     = true
 }
