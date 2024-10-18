@@ -124,6 +124,6 @@ module "lambda_functions" {
 
 module "api-rest" {
   source = "./modules/api-rest"
-  name = var.api_name
-  description = var.api_description
+  api_name = var.api_name
+  api_description = var.api_description
 }

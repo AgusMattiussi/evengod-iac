@@ -77,3 +77,14 @@ variable "lambda_functions" {
     source_dir = string
   }))
 }
+
+variable "api_name" {
+  description = "Name of the API"
+  type        = string
+}
+
+variable "api_description" {
+  description = "Description of the API"
+  type        = string
+  default     = "API description"
+}

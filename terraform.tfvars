@@ -20,7 +20,7 @@ rds_db_password = "admin123"
 vpc_endpoint_s3_name = "s3-images-vpc-endpoint"
 
 api_name = "evengod-rest-api"
-api_description = "Api rest del servicio de evengod"
+api_description = "REST API for EvenGod"
 
 # lambdas
 lambda_functions = [
