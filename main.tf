@@ -119,3 +119,11 @@ module "lambda_functions" {
     S3_BUCKET_NAME = var.s3_bucket_name
   }
 }
+
+# =============== REST API ===========================
+
+module "api-rest" {
+  source = "./modules/api-rest"
+  name = var.api_name
+  description = var.api_description
+}
