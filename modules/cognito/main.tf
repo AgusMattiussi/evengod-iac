@@ -4,7 +4,7 @@
 # - App client
 
 resource "aws_cognito_user_pool" "this" {
-    name = "evengod-user-pool"
+    name = var.user_pool_name
 
     username_attributes = ["email"]
 
@@ -63,6 +63,6 @@ resource "aws_cognito_user_pool" "this" {
 
 
 resource "aws_cognito_user_pool_domain" "domain" {
-  domain       = "evengod"
+  domain       = var.domain
   user_pool_id = aws_cognito_user_pool.this.id
 }

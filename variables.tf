@@ -68,9 +68,19 @@ variable "vpc_endpoint_s3_name" {
   type        = string
 }
 
+variable "cognito_domain" {
+  description = "Domain for the Cognito user pool"
+  type        = string
+}
+
+variable "user_pool_name" {
+  description = "Name of the Cognito user pool"
+  type        = string
+}
+
 variable "lambda_functions" {
   description = "List of Lambda functions to deploy"
-  type        = list(Object({
+  type        = list(object({
     name    = string
     handler = string
     runtime = string

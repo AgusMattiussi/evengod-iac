@@ -42,15 +42,21 @@ module "vpc_endpoints" {
 }
 
 # ================= S3 Buckets =================
+resource "random_string" "random_suffix" {
+  length  = 8
+  special = false
+  upper   = false
+}
+
 module "s3_frontend" {
   source      = "./modules/s3"
-  bucket_name = var.frontend_bucket_name
+  bucket_name = "${var.frontend_bucket_name}-${random_string.random_suffix.result}"
   is_website  = true
 }
 
 module "s3_images" {
   source      = "./modules/s3"
-  bucket_name = var.images_bucket_name
+  bucket_name = "${var.images_bucket_name}-${random_string.random_suffix.result}"
   is_website  = false
 }
 
@@ -82,8 +88,12 @@ module "rds_mysql" {
 
 
 # ================ Cognito =====================
-module "cognito"{
+module "cognito" {
   source = "./modules/cognito"
+  
+  domain          = "${var.cognito_domain}-${random_string.random_suffix.result}"
+  user_pool_name  = var.user_pool_name
+
 }
 
 
@@ -99,24 +109,25 @@ resource "aws_lambda_layer_version" "mysql_dependencies" {
 
 # ================= Lambda functions =================
 module "lambda_functions" {
-  source   = "./modules/lambda"
-  for_each = { for fn in var.lambda_functions : fn.name => fn }
+  depends_on = [module.security_groups, module.rds_mysql, module.s3_images]
+  source     = "./modules/lambdas"
+  for_each   = { for fn in var.lambda_functions : fn.name => fn }
 
-  function_name    = each.value.name
-  handler          = each.value.handler
-  runtime          = each.value.runtime
-  source_dir       = "${local.lambdas_dir}/${each.value.source_dir}"
-  role             = aws_iam_role.lambda_role.arn
-  layer_arn        = aws_lambda_layer_version.mysql_dependencies.arn
-  vpc_subnet_ids   = module.vpc.private_subnet_ids
+  function_name          = each.value.name
+  handler                = each.value.handler
+  runtime                = each.value.runtime
+  source_dir             = "${local.lambdas_dir}/${each.value.source_dir}"
+  role                   = data.aws_iam_role.lab_role.arn
+  layer_arn              = aws_lambda_layer_version.mysql_dependencies.arn
+  vpc_subnet_ids         = module.vpc.private_subnets
   vpc_security_group_ids = [module.security_groups.lambda_sg_id]
 
   environment_variables = {
-    RDS_PROXY      = var.rds_proxy
-    DB_USERNAME    = var.db_username
-    DB_PASSWORD    = var.db_password
-    DB_NAME        = var.db_name
-    S3_BUCKET_NAME = var.s3_bucket_name
+    RDS_PROXY      = module.rds_mysql.proxy_endpoint
+    DB_USERNAME    = var.rds_db_username
+    DB_PASSWORD    = var.rds_db_password
+    DB_NAME        = var.rds_db_name
+    S3_BUCKET_NAME = var.images_bucket_name
   }
 }
 
