@@ -35,7 +35,7 @@ resource "aws_db_instance" "mysql_rds" {
 
 # ================= RDS Proxy =================
 resource "aws_secretsmanager_secret" "db_credentials" {
-  name = "${var.name}-db-credentials"
+  name = "${var.name}-credentials"
 }
 
 resource "aws_secretsmanager_secret_version" "db_credentials" {
