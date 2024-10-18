@@ -133,8 +133,9 @@ module "lambda_functions" {
 
 # =============== REST API ===========================
 
-module "api-rest" {
+module "api_gateway" {
   source = "./modules/api-rest"
   api_name = var.api_name
   api_description = var.api_description
+  stage_name = var.stage_name
 }

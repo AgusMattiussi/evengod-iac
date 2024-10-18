@@ -20,12 +20,14 @@ rds_db_password = "admin123"
 
 vpc_endpoint_s3_name = "s3-images-vpc-endpoint"
 
-api_name = "evengod-rest-api"
-api_description = "REST API for EvenGod"
-
 # cognito
 cognito_domain         = "evengod"
 user_pool_name = "evengod-user-pool"
+
+# API GW
+api_name = "evengod-rest-api"
+api_description = "REST API for evengod services"
+stage_name = "prod"
 
 # lambdas
 lambda_functions = [
