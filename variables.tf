@@ -98,3 +98,9 @@ variable "api_description" {
   type        = string
   default     = "API description"
 }
+
+variable "stage_name" {
+  description = "Name of the API stage"
+  type        = string
+  default     = "prod"
+}
