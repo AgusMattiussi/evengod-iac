@@ -119,11 +119,11 @@ module "lambda_functions" {
   source_dir             = "${local.lambdas_dir}/${each.value.source_dir}"
   role                   = data.aws_iam_role.lab_role.arn
   layer_arn              = aws_lambda_layer_version.mysql_dependencies.arn
-  vpc_subnet_ids         = module.vpc.private_subnets
+  vpc_subnet_ids         = data.aws_subnets.lambdas_subnets.ids
   vpc_security_group_ids = [module.security_groups.lambda_sg_id]
 
   environment_variables = {
-    RDS_HOST      = module.rds_mysql.proxy_endpoint
+    RDS_HOST       = module.rds_mysql.proxy_endpoint
     DB_USERNAME    = var.rds_db_username
     DB_PASSWORD    = var.rds_db_password
     DB_NAME        = var.rds_db_name
