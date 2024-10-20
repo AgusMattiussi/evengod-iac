@@ -2,19 +2,19 @@ const mysql = require('mysql2/promise');
 
 const sqlScript = `
 -- Create the database
-CREATE DATABASE IF NOT EXISTS evengod;
+CREATE DATABASE IF NOT EXISTS evengoddb;
 
 -- Switch to the new database
 USE evengod;
 
 -- Create tables
-CREATE TABLE IF NOT EXISTS categories (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    name VARCHAR(100) NOT NULL,
-    UNIQUE(name)
+CREATE TABLE categories (
+	id INT AUTO_INCREMENT PRIMARY KEY,
+	name VARCHAR(100) NOT NULL,
+	UNIQUE(name)
 ) ENGINE=InnoDB;
 
-CREATE TABLE IF NOT EXISTS events (
+CREATE TABLE events (
     id INT AUTO_INCREMENT PRIMARY KEY,
     title VARCHAR(100) NOT NULL,
     category_id INT DEFAULT 0,
@@ -34,7 +34,8 @@ CREATE TABLE IF NOT EXISTS events (
     FOREIGN KEY(category_id) REFERENCES categories(id) ON DELETE SET DEFAULT
 ) ENGINE=InnoDB;
 
-CREATE TABLE IF NOT EXISTS inscriptions (
+
+CREATE TABLE inscriptions (
     id INT AUTO_INCREMENT PRIMARY KEY,
     user_uuid VARCHAR(36),
     event_id INT,
@@ -46,14 +47,14 @@ CREATE TABLE IF NOT EXISTS inscriptions (
 ) ENGINE=InnoDB;
 
 -- Create index for searching events by category_id
-CREATE INDEX IF NOT EXISTS idx_event_by_category_id ON events(category_id);
+CREATE INDEX idx_event_by_category_id ON events(category_id);
 
--- Create indexes for searching inscriptions by event_id and user_id
-CREATE INDEX IF NOT EXISTS idx_inscription_by_event_id ON inscriptions (event_id);
-CREATE INDEX IF NOT EXISTS idx_inscription_by_user_id ON inscriptions (user_uuid);
+-- Create indexes for searching inscriptions by event_id and user_uuid
+CREATE INDEX idx_inscription_by_event_id ON inscriptions (event_id);
+CREATE INDEX idx_inscription_by_user_uuid ON inscriptions (user_uuid);
 
--- Insert categories if they don't exist
-INSERT IGNORE INTO categories (name) VALUES 
+INSERT INTO categories (name)
+VALUES 
 ('Sin Categoría'),
 ('Tecnología'),
 ('Medioambiente'),
@@ -72,8 +73,6 @@ exports.handler = async (event) => {
     const dbConfig = {
         host: process.env.RDS_HOST,
         user: process.env.DB_USERNAME,
-        password: process.env.DB_PASSWORD,
-        database: process.env.DB_NAME,
     };
 
     let connection;

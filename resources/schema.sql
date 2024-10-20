@@ -1,5 +1,5 @@
 -- Create the database
-CREATE DATABASE IF NOT EXISTS evengod;
+CREATE DATABASE IF NOT EXISTS evengoddb;
 
 -- Switch to the new database
 USE evengod;
@@ -28,7 +28,6 @@ CREATE TABLE events (
     image_url TEXT,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    FOREIGN KEY(user_id) REFERENCES users(id) ON DELETE CASCADE,
     FOREIGN KEY(category_id) REFERENCES categories(id) ON DELETE SET DEFAULT
 ) ENGINE=InnoDB;
 
@@ -40,17 +39,16 @@ CREATE TABLE inscriptions (
     state VARCHAR(50),
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    FOREIGN KEY(user_id) REFERENCES users(id) ON DELETE CASCADE,
     FOREIGN KEY(event_id) REFERENCES events(id) ON DELETE CASCADE,
-    UNIQUE(user_id, event_id)
+    UNIQUE(user_uuid, event_id)
 ) ENGINE=InnoDB;
 
 -- Create index for searching events by category_id
 CREATE INDEX idx_event_by_category_id ON events(category_id);
 
--- Create indexes for searching inscriptions by event_id and user_id
+-- Create indexes for searching inscriptions by event_id and user_uuid
 CREATE INDEX idx_inscription_by_event_id ON inscriptions (event_id);
-CREATE INDEX idx_inscription_by_user_id ON inscriptions (user_uuid);
+CREATE INDEX idx_inscription_by_user_uuid ON inscriptions (user_uuid);
 
 INSERT INTO categories (name)
 VALUES 
