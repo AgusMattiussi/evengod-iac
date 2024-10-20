@@ -1,9 +1,9 @@
 output "api_id" {
-  description = "ID de la API REST"
+  description = "ID of the API Gateway"
   value       = aws_api_gateway_rest_api.this.id
 }
 
 output "invoke_url" {
-  description = "URL para invocar la API"
+  description = "URL for invoking the API"
   value       = aws_api_gateway_deployment.this.invoke_url
 }
