@@ -55,7 +55,7 @@ resource "aws_db_proxy" "rds_proxy" {
   idle_client_timeout    = 5
   require_tls            = true
   role_arn               = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/LabRole"
-  vpc_security_group_ids = var.vpc_security_group_ids
+  vpc_security_group_ids = var.rds_proxy_sg
   vpc_subnet_ids         = var.subnet_ids
 
   auth {
