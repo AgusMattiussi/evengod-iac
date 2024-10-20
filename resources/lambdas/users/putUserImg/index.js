@@ -1,52 +1,75 @@
 const AWS = require('aws-sdk');
-const mysql = require('mysql2/promise');
-
 const s3 = new AWS.S3();
-
-// Database configuration
-const dbConfig = {
-  host: process.env.RDS_HOST,
-  user: process.env.DB_USERNAME,
-  password: process.env.DB_PASSWORD,
-  database: process.env.DB_NAME,
-};
+const cognito = new AWS.CognitoIdentityServiceProvider();
 
 exports.handler = async (event) => {
-  let connection;
   try {
-    const userId = event.pathParameters && event.pathParameters.id;
-    const { fileName, data } = JSON.parse(event.body);
+    const pathUserId = event.pathParameters && event.pathParameters.id;
+    const userUuid = event.requestContext.authorizer.claims.sub;
+
+    if (!userUuid) {
+      return {
+          statusCode: 400,
+          body: JSON.stringify({
+              message: "Missing UUID from Cognito",
+          }),
+      };
+  }
+
+  if (!pathUserId || pathUserId !== userUuid) {
+      return {
+          statusCode: 400,
+          body: JSON.stringify({
+          message: "User ID does not match the authenticated user",
+          }),
+      };
+  }
+
+    const { data } = JSON.parse(event.body);
     const bucketName = process.env.S3_BUCKET_NAME;
 
-    // Upload file to S3
-    const params = {
+    if (!data) {
+      return {
+        statusCode: 400,
+        body: JSON.stringify({ message: 'Missing required fields: data' }),
+      };
+    }
+
+    // Upload picture to S3 bucket
+    const s3Params = {
       Bucket: bucketName,
-      Key: fileName,
+      Key: pathUserId,
       Body: Buffer.from(data, 'base64'),
-      ContentType: 'image/jpeg', // Adjust based on your file type
-      ACL: 'public-read' // Allow read access to the file
+      ContentType: 'image/jpeg',
+      ACL: 'public-read',
     };
 
-    const uploadResult = await s3.upload(params).promise();
-    // Generate the URL for the uploaded file
+    const uploadResult = await s3.upload(s3Params).promise();
     const imageUrl = uploadResult.Location;
 
-    // Save URL to database
-    connection = await mysql.createConnection(dbConfig);
-    await connection.execute(
-      'UPDATE users SET profile_image_url = ? WHERE id = ?',
-      [imageUrl, userId]
-    );
+    // Update picture URL in Cognito
+    const updateParams = {
+      UserPoolId: process.env.USER_POOL_ID, 
+      Username: pathUserId,
+      UserAttributes: [
+        {
+          Name: 'picture',
+          Value: imageUrl,
+        },
+      ],
+    };
+
+    await cognito.adminUpdateUserAttributes(updateParams).promise();
 
     return {
       statusCode: 200,
-      body: JSON.stringify({ message: 'Image uploaded and URL saved successfully', imageUrl })
+      body: JSON.stringify({ message: 'Image uploaded and URL saved successfully', imageUrl }),
     };
   } catch (error) {
-    console.error('Error:', error);
+    console.error('Error uploading image or updating Cognito:', error);
     return {
       statusCode: 500,
-      body: JSON.stringify({ message: 'Error processing request', error: error.message })
+      body: JSON.stringify({ message: 'Error processing request', error: error.message }),
     };
   }
 };

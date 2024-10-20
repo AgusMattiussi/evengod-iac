@@ -1,40 +1,53 @@
-const mysql = require('mysql2/promise');
-
-// Database configuration
-const dbConfig = {
-  host: process.env.RDS_HOST,
-  user: process.env.DB_USERNAME,
-  password: process.env.DB_PASSWORD,
-  database: process.env.DB_NAME,
-};
+const AWS = require('aws-sdk');
+const cognito = new AWS.CognitoIdentityServiceProvider();
 
 exports.handler = async (event) => {
-  let connection;
   try {
     const userId = event.pathParameters && event.pathParameters.id;
 
-    connection = await mysql.createConnection(dbConfig);
-    const [rows] = await connection.execute(
-      'SELECT profile_image_url FROM users WHERE id = ?',
-      [userId]
-    );
+    if (!userId) {
+      return {
+        statusCode: 400,
+        body: JSON.stringify({
+          message: "User ID is required in the path",
+        }),
+      };
+    }
 
-    if (rows.length > 0 && rows[0].profile_image_url) {
+    const params = {
+      UserPoolId: process.env.USER_POOL_ID,
+      Filter: `sub = "${userId}"`,
+    };
+
+    const userResponse = await cognito.listUsers(params).promise();
+
+    if (userResponse.Users.length === 0) {
+      return {
+        statusCode: 404,
+        body: JSON.stringify({ message: 'User not found' }),
+      };
+    }
+
+    const cognitoUser = userResponse.Users[0];
+    const imageUrl = cognitoUser.Attributes.find(attr => attr.Name === 'picture')?.Value || '';
+
+    if (imageUrl) {
       return {
         statusCode: 200,
-        body: JSON.stringify({ imageUrl: rows[0].profile_image_url })
+        body: JSON.stringify({ imageUrl }),
       };
     } else {
       return {
         statusCode: 404,
-        body: JSON.stringify({ message: 'Image URL not found for the user' })
+        body: JSON.stringify({ message: 'Image URL not found for the user' }),
       };
     }
+
   } catch (error) {
-    console.error('Error:', error);
+    console.error('Error retrieving user image URL:', error);
     return {
       statusCode: 500,
-      body: JSON.stringify({ message: 'Error retrieving URL from database', error: error.message })
+      body: JSON.stringify({ message: 'Error retrieving user information', error: error.message }),
     };
   }
 };

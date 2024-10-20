@@ -140,12 +140,6 @@ lambda_functions = [
     source_dir = "users/getUserImg"
   },
   {
-    name       = "getUsers"
-    handler    = "index.handler"
-    runtime    = "nodejs20.x"
-    source_dir = "users/getUsers"
-  },
-  {
     name       = "putUserImg"
     handler    = "index.handler"
     runtime    = "nodejs20.x"

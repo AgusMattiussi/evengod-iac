@@ -15,13 +15,22 @@ exports.handler = async (event) => {
     let connection;
 
     try {
-        console.log(event);
+        const userUuid = event.requestContext.authorizer.claims.sub;
+
+        if (!userUuid) {
+            return {
+                statusCode: 400,
+                body: JSON.stringify({
+                    message: "Missing UUID from Cognito",
+                }),
+            };
+        }
 
         const to_insert = JSON.parse(event.body);
-        const { user_id, event_id, state } = to_insert;
+        const { event_id, state } = to_insert;
 
         // Validate input
-        if (!user_id || !event_id || !state) {
+        if (!event_id || !state) {
             return {
                 statusCode: 400,
                 body: JSON.stringify({ message: "Missing required fields" }),
@@ -34,7 +43,7 @@ exports.handler = async (event) => {
         // Insert the new inscription
         const [result] = await connection.execute(
             INSERT_INSCRIPTION_QUERY,
-            [user_id, event_id, state]
+            [userUuid, event_id, state]
         );
 
         return {
