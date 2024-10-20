@@ -81,3 +81,8 @@ variable "backup_retention_period" {
   type        = number
   default     = 1
 }
+
+variable "rds_proxy_sg" {
+  description = "Security group for the RDS Proxy"
+  type        = list(string)
+}

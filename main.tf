@@ -84,6 +84,9 @@ module "rds_mysql" {
 
   subnet_ids             = data.aws_subnets.rds_subnets.ids
   vpc_security_group_ids = [module.security_groups.mysql_sg_id]
+
+  rds_proxy_sg = [module.security_groups.rdsproxy_sg_id]
+
 }
 
 
