@@ -1,89 +1,74 @@
-const mysql = require('mysql2/promise');
-const bcrypt = require('bcryptjs');
-
-// Database configuration
-const dbConfig = {
-  host: process.env.RDS_HOST,
-  user: process.env.DB_USERNAME,
-  password: process.env.DB_PASSWORD,
-  database: process.env.DB_NAME,
-};
+const AWS = require('aws-sdk');
+const cognito = new AWS.CognitoIdentityServiceProvider();
 
 exports.handler = async (event) => {
-  let connection;
   try {
-    console.log(event);
-
-    const { email, username, password, description, homeplace, profile_image_url } = JSON.parse(event.body);
-
-    // Validate input
-    if (!email) {
+    if (!event.requestContext || !event.requestContext.authorizer) {
       return {
-        statusCode: 400,
-        body: JSON.stringify({ message: 'Email is required' }),
+        statusCode: 401,
+        body: JSON.stringify({ message: 'Unauthorized' }),
       };
     }
 
-    // Connect to the database
-    connection = await mysql.createConnection(dbConfig);
+    // Check UUID of the user making the request
+    const userUuid = event.requestContext.authorizer.claims.sub;
+    const pathUserId = event.pathParameters && event.pathParameters.id;
 
-    // Start building the update query
-    let updateQuery = 'UPDATE users SET';
-    const updateValues = [];
-    const updateFields = [];
-
-    if (username) {
-      updateFields.push('username = ?');
-      updateValues.push(username);
+    if (!userUuid) {
+        return {
+            statusCode: 400,
+            body: JSON.stringify({
+                message: "Missing UUID from Cognito",
+            }),
+        };
     }
+
+    if (!pathUserId || pathUserId !== userUuid) {
+        return {
+            statusCode: 400,
+            body: JSON.stringify({
+            message: "User ID does not match the authenticated user",
+            }),
+        };
+    }
+
+    // The username is the email address
+    const userEmail = event.requestContext.authorizer.claims['cognito:username'];
+
+    const { name, password, homeplace, profile_image_url, description } = JSON.parse(event.body);
+
+    const userAttributes = [];
+    if (name) userAttributes.push({ Name: 'name', Value: name });
+    if (homeplace) userAttributes.push({ Name: 'custom:homeplace', Value: homeplace });
+    if (profile_image_url) userAttributes.push({ Name: 'picture', Value: profile_image_url });
+    if (description) userAttributes.push({ Name: 'custom:description', Value: description });
+
+    if (userAttributes.length > 0) {
+      await cognito.adminUpdateUserAttributes({
+        UserPoolId: process.env.USER_POOL_ID,
+        Username: userEmail,
+        UserAttributes: userAttributes,
+      }).promise();
+    }
+
     if (password) {
-      const saltRounds = 10;
-      const hashedPassword = await bcrypt.hash(password, saltRounds);
-      updateFields.push('password = ?');
-      updateValues.push(hashedPassword);
-    }
-    if (description !== undefined) {
-      updateFields.push('description = ?');
-      updateValues.push(description);
-    }
-    if (homeplace !== undefined) {
-      updateFields.push('homeplace = ?');
-      updateValues.push(homeplace);
-    }
-    if (profile_image_url !== undefined) {
-      updateFields.push('profile_image_url = ?');
-      updateValues.push(profile_image_url);
-    }
-
-    if (updateFields.length === 0) {
-      return {
-        statusCode: 400,
-        body: JSON.stringify({ message: 'No fields to update' }),
-      };
-    }
-
-    updateQuery += ' ' + updateFields.join(', ') + ' WHERE email = ?';
-    updateValues.push(email);
-
-    // Execute the update query
-    const [result] = await connection.execute(updateQuery, updateValues);
-
-    if (result.affectedRows === 0) {
-      return {
-        statusCode: 404,
-        body: JSON.stringify({ message: 'User not found' }),
-      };
+      await cognito.adminSetUserPassword({
+        UserPoolId: process.env.USER_POOL_ID,
+        Username: userEmail,
+        Password: password,
+        Permanent: true,
+      }).promise();
     }
 
     return {
       statusCode: 200,
       headers: {
         'Content-Type': 'application/json',
-        'Access-Control-Allow-Origin': '*', 
+        'Access-Control-Allow-Origin': '*',
       },
       body: JSON.stringify({
         message: 'User updated successfully',
-        email: email,
+        username: userEmail,
       }),
     };
   } catch (error) {
@@ -92,9 +77,5 @@ exports.handler = async (event) => {
       statusCode: 500,
       body: JSON.stringify({ message: 'Error updating user', error: error.message }),
     };
-  } finally {
-    if (connection) {
-      await connection.end();
-    }
   }
 };

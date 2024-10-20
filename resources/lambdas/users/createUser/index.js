@@ -1,16 +1,7 @@
-const mysql = require('mysql2/promise');
-const bcrypt = require('bcryptjs');
-
-// Database configuration
-const dbConfig = {
-  host: process.env.RDS_HOST,
-  user: process.env.DB_USERNAME,
-  password: process.env.DB_PASSWORD,
-  database: process.env.DB_NAME,
-};
+const AWS = require('aws-sdk');
+const cognito = new AWS.CognitoIdentityServiceProvider();
 
 exports.handler = async (event) => {
-  let connection;
 
   try {
     console.log(event);
@@ -23,18 +14,27 @@ exports.handler = async (event) => {
         body: JSON.stringify({ message: 'Missing required fields' }),
       };
     }
-    
-    const saltRounds = 10;
-    const hashedPassword = await bcrypt.hash(password, saltRounds);
 
-    // Connect to the database
-    connection = await mysql.createConnection(dbConfig);
+    const params = {
+      UserPoolId: process.env.USER_POOL_ID,
+      Username: email,
+      UserAttributes: [
+        { Name: 'email', Value: email },
+        { Name: 'email_verified', Value: 'true' },
+        { Name: 'name', Value: username },
+      ],
+      MessageAction: 'SUPPRESS',
+    };
 
-    // Insert the new user
-    const [result] = await connection.execute(
-      'INSERT INTO users (username, email, password) VALUES (?, ?, ?)',
-      [username, email, hashedPassword]
-    );
+    const result = await cognito.adminCreateUser(params).promise();
+
+    await cognito.adminSetUserPassword({
+      UserPoolId: process.env.USER_POOL_ID,
+      Username: email,
+      Password: password,
+      Permanent: true,
+    }).promise();
+
 
     return {
       statusCode: 201,
@@ -56,9 +56,5 @@ exports.handler = async (event) => {
       statusCode: 500,
       body: JSON.stringify({ message: 'Error creating user', error: error.message }),
     };
-  } finally {
-    if (connection) {
-      await connection.end();
-    }
   }
 };

@@ -3,7 +3,6 @@ const mysql = require('mysql2/promise');
 
 const s3 = new AWS.S3();
 
-// Database configuration
 const dbConfig = {
   host: process.env.RDS_HOST,
   user: process.env.DB_USERNAME,
@@ -15,25 +14,53 @@ exports.handler = async (event) => {
   let connection;
   try {
     const eventId = event.pathParameters && event.pathParameters.id;
-    const { fileName, data } = JSON.parse(event.body);
+    const userUuid = event.requestContext.authorizer.claims.sub;  // User's UUID
+
+    if (!eventId) {
+      return {
+        statusCode: 400,
+        body: JSON.stringify({ message: "eventId is required in the path" }),
+      };
+    }
+
+    connection = await mysql.createConnection(dbConfig);
+
+    // Check if user is event creator
+    const [eventResult] = await connection.execute(
+      "SELECT user_uuid FROM events WHERE id = ?",
+      [eventId]
+    );
+
+    if (eventResult.length === 0) {
+      return {
+        statusCode: 404,
+        body: JSON.stringify({ message: `Event with eventId ${eventId} not found` }),
+      };
+    }
+
+    const eventUserUuid = eventResult[0].user_uuid;
+
+    if (eventUserUuid !== userUuid) {
+      return {
+        statusCode: 403,
+        body: JSON.stringify({ message: "You are not authorized to edit this event" }),
+      };
+    }
+
+    const { data } = JSON.parse(event.body);
     const bucketName = process.env.S3_BUCKET_NAME;
 
-    // Upload file to S3
     const params = {
       Bucket: bucketName,
-      Key: fileName,
+      Key: `event-${eventId}`,
       Body: Buffer.from(data, 'base64'),
-      ContentType: 'image/jpeg', // Adjust based on your file type
-      ACL: 'public-read' // Allow read access to the file
+      ContentType: 'image/jpeg', // Ajustar según el tipo de archivo
+      ACL: 'public-read', // Permitir acceso de lectura al archivo
     };
 
     const uploadResult = await s3.upload(params).promise();
 
-    // Generate the URL for the uploaded file
     const imageUrl = uploadResult.Location;
-
-    // Save URL to database
-    connection = await mysql.createConnection(dbConfig);
 
     await connection.execute(
       'UPDATE events SET image_url = ? WHERE id = ?',
@@ -42,13 +69,18 @@ exports.handler = async (event) => {
 
     return {
       statusCode: 200,
-      body: JSON.stringify({ message: 'Image uploaded and URL saved successfully', imageUrl })
+      body: JSON.stringify({ message: 'Image uploaded and URL saved successfully', imageUrl }),
     };
+
   } catch (error) {
     console.error('Error:', error);
     return {
       statusCode: 500,
-      body: JSON.stringify({ message: 'Error processing request', error: error.message })
+      body: JSON.stringify({ message: 'Error processing request', error: error.message }),
     };
+  } finally {
+    if (connection) {
+      await connection.end();
+    }
   }
 };
