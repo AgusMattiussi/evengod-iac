@@ -50,28 +50,6 @@ resource "aws_s3_bucket_policy" "frontend_bucket_policy" {
     })
 }
 
-resource "null_resource" "frontend_build" {
-  count = var.is_website ? 1 : 0
-
-  provisioner "local-exec" {
-    command = "npm install && npm run build"
-    working_dir = local.frontend_directory
-  }
-}
-
-resource "aws_s3_object" "file" {
-    depends_on = [ null_resource.frontend_build ]
-
-    for_each = var.is_website ? fileset(local.build_directory, "**") : toset([])
-
-    bucket = aws_s3_bucket.bucket.id
-    key    = each.value
-    source = "${local.build_directory}/${each.value}"
-    etag   = filemd5("${local.build_directory}/${each.value}")
-
-    content_type = lookup(local.mime_types, concat(regexall("([^\\.]*)$", each.value), [[""]])[0][0], "")
-}
-
 # ==================================== S3 Bucket For Images Configuration ====================================
 
 resource "aws_s3_bucket_ownership_controls" "images_bucket_ownership" {

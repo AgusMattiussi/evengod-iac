@@ -134,8 +134,39 @@ module "lambda_functions" {
 # =============== REST API ===========================
 
 module "api_gateway" {
-  source = "./modules/api-rest"
+  source = "./modules/api-gateway"
   api_name = var.api_name
   api_description = var.api_description
   stage_name = var.stage_name
 }
+
+# =============== Frontend Build =====================
+
+resource "null_resource" "api-gateway-url" {
+  provisioner "local-exec" {
+    command = "./set-api-gw.sh ${module.api_gateway.invoke_url}"
+  }
+}
+
+resource "null_resource" "frontend_build" {
+  depends_on = [ null_resource.api-gateway-url, module.s3_frontend ]
+
+  provisioner "local-exec" {
+    command = "npm install && npm run build"
+    working_dir = local.frontend_directory
+  }
+}
+
+resource "aws_s3_object" "file" {
+    depends_on = [ null_resource.frontend_build ]
+
+    for_each = fileset(local.build_directory, "**")
+
+    bucket = module.s3_frontend.bucket_id
+    key    = each.value
+    source = "${local.build_directory}/${each.value}"
+    etag   = filemd5("${local.build_directory}/${each.value}")
+
+    content_type = lookup(local.mime_types, concat(regexall("([^\\.]*)$", "${each.value}"), [[""]])[0][0], "")
+}
+
