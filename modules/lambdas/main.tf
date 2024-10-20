@@ -12,6 +12,7 @@ resource "aws_lambda_function" "function" {
   handler          = var.handler
   source_code_hash = data.archive_file.lambda_zip.output_base64sha256
   runtime          = var.runtime
+  timeout          = 30
 
   layers = [var.layer_arn]
 

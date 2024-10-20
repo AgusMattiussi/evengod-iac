@@ -34,5 +34,5 @@ resource "aws_route_table_association" "private" {
   count = length(var.private_subnet_cidrs)
 
   subnet_id      = module.private_subnet[count.index].id
-  route_table_id = aws_route_table.private[count.index % length(var.availability_zones)].id
+  route_table_id = aws_route_table.private[count.index].id
 }
