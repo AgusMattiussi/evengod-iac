@@ -123,13 +123,28 @@ module "lambda_functions" {
   vpc_security_group_ids = [module.security_groups.lambda_sg_id]
 
   environment_variables = {
-    RDS_PROXY      = module.rds_mysql.proxy_endpoint
+    RDS_HOST      = module.rds_mysql.proxy_endpoint
     DB_USERNAME    = var.rds_db_username
     DB_PASSWORD    = var.rds_db_password
     DB_NAME        = var.rds_db_name
     S3_BUCKET_NAME = "${var.images_bucket_name}-${random_string.random_suffix.result}"
   }
 }
+
+
+resource "null_resource" "invoke_db" {
+  depends_on = [ module.lambda_functions, module.rds_mysql ]
+
+  provisioner "local-exec" {
+    command = "aws lambda invoke --function-name ${module.lambda_functions["setupDB"].function_name} response.json"
+  }
+
+  triggers = {
+    lambda_source_code = module.lambda_functions["setupDB"].source_code_hash
+  }
+}
+
+
 
 # =============== REST API ===========================
 

@@ -8,7 +8,8 @@ output "function_arn" {
   value       = aws_lambda_function.function.arn
 }
 
-output "last_modified" {
-  description = "Date this resource was last modified"
-  value       = aws_lambda_function.function.last_modified
+
+output "source_code_hash" {
+  description = "Base64-encoded representation of the Lambda function's deployment package"
+  value       = aws_lambda_function.function.source_code_hash
 }

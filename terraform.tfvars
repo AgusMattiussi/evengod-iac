@@ -150,6 +150,12 @@ lambda_functions = [
     handler    = "index.handler"
     runtime    = "nodejs20.x"
     source_dir = "users/putUserImg"
+  },
+  {
+    name       = "setupDB"
+    handler    = "index.handler"
+    runtime    = "nodejs20.x"
+    source_dir = "db/"
   }
 ]
 
