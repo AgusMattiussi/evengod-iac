@@ -14,3 +14,7 @@ variable "stage_name" {
   type        = string
   default     = "dev"
 }
+
+variable "lambda_function_arns" {
+  type = map(string)
+}

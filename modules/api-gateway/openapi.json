@@ -5,7 +5,7 @@
     "version" : "2024-09-23T17:14:53Z"
   },
   "servers" : [ {
-    "url" : "https://mfesvi0wch.execute-api.us-east-1.amazonaws.com/{basePath}",
+    "url" : "${api_gateway_url}/{basePath}",
     "variables" : {
       "basePath" : {
         "default" : "prod"
@@ -37,7 +37,7 @@
         },
         "x-amazon-apigateway-integration" : {
           "httpMethod" : "POST",
-          "uri" : "arn:aws:apigateway:us-east-1:lambda:path/2015-03-31/functions/arn:aws:lambda:us-east-1:595208992199:function:getEventsByUserId/invocations",
+          "uri" : "arn:aws:apigateway:${aws_region}:lambda:path/2015-03-31/functions/${getEventsByUserIdLambdaArn}/invocations",
           "responses" : {
             "default" : {
               "statusCode" : "200"
@@ -124,7 +124,7 @@
         },
         "x-amazon-apigateway-integration" : {
           "httpMethod" : "POST",
-          "uri" : "arn:aws:apigateway:us-east-1:lambda:path/2015-03-31/functions/arn:aws:lambda:us-east-1:595208992199:function:getInscriptions/invocations",
+          "uri" : "arn:aws:apigateway:${aws_region}:lambda:path/2015-03-31/functions/${getInscriptionsLambdaArn}/invocations",
           "responses" : {
             "default" : {
               "statusCode" : "200"
@@ -161,7 +161,7 @@
         },
         "x-amazon-apigateway-integration" : {
           "httpMethod" : "POST",
-          "uri" : "arn:aws:apigateway:us-east-1:lambda:path/2015-03-31/functions/arn:aws:lambda:us-east-1:595208992199:function:createInscription/invocations",
+          "uri" : "arn:aws:apigateway:${aws_region}:lambda:path/2015-03-31/functions/${createInscriptionLambdaArn}/invocations",
           "responses" : {
             "default" : {
               "statusCode" : "200"
@@ -246,7 +246,7 @@
         },
         "x-amazon-apigateway-integration" : {
           "httpMethod" : "POST",
-          "uri" : "arn:aws:apigateway:us-east-1:lambda:path/2015-03-31/functions/arn:aws:lambda:us-east-1:595208992199:function:getUserImg/invocations",
+          "uri" : "arn:aws:apigateway:${aws_region}:lambda:path/2015-03-31/functions/${getUserImgLambdaArn}/invocations",
           "responses" : {
             "default" : {
               "statusCode" : "200"
@@ -293,7 +293,7 @@
         },
         "x-amazon-apigateway-integration" : {
           "httpMethod" : "POST",
-          "uri" : "arn:aws:apigateway:us-east-1:lambda:path/2015-03-31/functions/arn:aws:lambda:us-east-1:595208992199:function:putUserImg/invocations",
+          "uri" : "arn:aws:apigateway:${aws_region}:lambda:path/2015-03-31/functions/${putUserImgLambdaArn}/invocations",
           "responses" : {
             "default" : {
               "statusCode" : "200"
@@ -390,7 +390,7 @@
         },
         "x-amazon-apigateway-integration" : {
           "httpMethod" : "POST",
-          "uri" : "arn:aws:apigateway:us-east-1:lambda:path/2015-03-31/functions/arn:aws:lambda:us-east-1:595208992199:function:createUser/invocations",
+          "uri" : "arn:aws:apigateway:${aws_region}:lambda:path/2015-03-31/functions/${createUserLambdaArn}/invocations",
           "responses" : {
             "default" : {
               "statusCode" : "200"
@@ -427,7 +427,7 @@
         },
         "x-amazon-apigateway-integration" : {
           "httpMethod" : "POST",
-          "uri" : "arn:aws:apigateway:us-east-1:lambda:path/2015-03-31/functions/arn:aws:lambda:us-east-1:595208992199:function:getEventImg/invocations",
+          "uri" : "arn:aws:apigateway:${aws_region}:lambda:path/2015-03-31/functions/${getEventImgLambdaArn}/invocations",
           "responses" : {
             "default" : {
               "statusCode" : "200"
@@ -474,7 +474,7 @@
         },
         "x-amazon-apigateway-integration" : {
           "httpMethod" : "POST",
-          "uri" : "arn:aws:apigateway:us-east-1:lambda:path/2015-03-31/functions/arn:aws:lambda:us-east-1:595208992199:function:putEventImg/invocations",
+          "uri" : "arn:aws:apigateway:${aws_region}:lambda:path/2015-03-31/functions/${putEventImgLambdaArn}/invocations",
           "responses" : {
             "default" : {
               "statusCode" : "200"
@@ -561,7 +561,7 @@
         },
         "x-amazon-apigateway-integration" : {
           "httpMethod" : "POST",
-          "uri" : "arn:aws:apigateway:us-east-1:lambda:path/2015-03-31/functions/arn:aws:lambda:us-east-1:595208992199:function:getEvents/invocations",
+          "uri" : "arn:aws:apigateway:${aws_region}:lambda:path/2015-03-31/functions/${getEventsLambdaArn}/invocations",
           "responses" : {
             "default" : {
               "statusCode" : "200"
@@ -598,7 +598,7 @@
         },
         "x-amazon-apigateway-integration" : {
           "httpMethod" : "POST",
-          "uri" : "arn:aws:apigateway:us-east-1:lambda:path/2015-03-31/functions/arn:aws:lambda:us-east-1:595208992199:function:createEvent/invocations",
+          "uri" : "arn:aws:apigateway:${aws_region}:lambda:path/2015-03-31/functions/${createEventLambdaArn}/invocations",
           "responses" : {
             "default" : {
               "statusCode" : "200"
@@ -733,7 +733,7 @@
         },
         "x-amazon-apigateway-integration" : {
           "httpMethod" : "POST",
-          "uri" : "arn:aws:apigateway:us-east-1:lambda:path/2015-03-31/functions/arn:aws:lambda:us-east-1:595208992199:function:getUserById/invocations",
+          "uri" : "arn:aws:apigateway:${aws_region}:lambda:path/2015-03-31/functions/${getUserByIdLambdaArn}/invocations",
           "responses" : {
             "default" : {
               "statusCode" : "200"
@@ -783,7 +783,7 @@
         },
         "x-amazon-apigateway-integration" : {
           "httpMethod" : "POST",
-          "uri" : "arn:aws:apigateway:us-east-1:lambda:path/2015-03-31/functions/arn:aws:lambda:us-east-1:595208992199:function:editUser/invocations",
+          "uri" : "arn:aws:apigateway:${aws_region}:lambda:path/2015-03-31/functions/${editUserLambdaArn}/invocations",
           "responses" : {
             "default" : {
               "statusCode" : "200"
@@ -823,7 +823,7 @@
         },
         "x-amazon-apigateway-integration" : {
           "httpMethod" : "POST",
-          "uri" : "arn:aws:apigateway:us-east-1:lambda:path/2015-03-31/functions/arn:aws:lambda:us-east-1:595208992199:function:deleteUser/invocations",
+          "uri" : "arn:aws:apigateway:${aws_region}:lambda:path/2015-03-31/functions/${deleteUserLambdaArn}/invocations",
           "responses" : {
             "default" : {
               "statusCode" : "200"
@@ -921,7 +921,7 @@
         },
         "x-amazon-apigateway-integration" : {
           "httpMethod" : "POST",
-          "uri" : "arn:aws:apigateway:us-east-1:lambda:path/2015-03-31/functions/arn:aws:lambda:us-east-1:595208992199:function:getInscriptionById/invocations",
+          "uri" : "arn:aws:apigateway:${aws_region}:lambda:path/2015-03-31/functions/${getCategoryByIdLambdaArn}/invocations",
           "responses" : {
             "default" : {
               "statusCode" : "200"
@@ -1063,7 +1063,7 @@
         },
         "x-amazon-apigateway-integration" : {
           "httpMethod" : "POST",
-          "uri" : "arn:aws:apigateway:us-east-1:lambda:path/2015-03-31/functions/arn:aws:lambda:us-east-1:595208992199:function:getEventById/invocations",
+          "uri" : "arn:aws:apigateway:${aws_region}:lambda:path/2015-03-31/functions/${getEventByIdLambdaArn}/invocations",
           "responses" : {
             "default" : {
               "statusCode" : "200"
@@ -1113,7 +1113,7 @@
         },
         "x-amazon-apigateway-integration" : {
           "httpMethod" : "POST",
-          "uri" : "arn:aws:apigateway:us-east-1:lambda:path/2015-03-31/functions/arn:aws:lambda:us-east-1:595208992199:function:editEvent/invocations",
+          "uri" : "arn:aws:apigateway:${aws_region}:lambda:path/2015-03-31/functions/${editEventLambdaArn}/invocations",
           "responses" : {
             "default" : {
               "statusCode" : "200"
@@ -1203,7 +1203,7 @@
         },
         "x-amazon-apigateway-integration" : {
           "httpMethod" : "POST",
-          "uri" : "arn:aws:apigateway:us-east-1:lambda:path/2015-03-31/functions/arn:aws:lambda:us-east-1:595208992199:function:getCategories/invocations",
+          "uri" : "arn:aws:apigateway:${aws_region}:lambda:path/2015-03-31/functions/${getCategoriesLambdaArn}/invocations",
           "responses" : {
             "default" : {
               "statusCode" : "200"

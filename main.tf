@@ -140,7 +140,7 @@ resource "null_resource" "invoke_db" {
   depends_on = [ module.lambda_functions, module.rds_mysql ]
 
   provisioner "local-exec" {
-    command = "aws lambda invoke --function-name ${module.lambda_functions["setupDB"].function_name} response.json"
+    command = "aws lambda invoke --function-name ${module.lambda_functions["setupDB"].function_name}"
   }
 
   triggers = {
@@ -153,10 +153,15 @@ resource "null_resource" "invoke_db" {
 # =============== REST API ===========================
 
 module "api_gateway" {
+  depends_on = [ module.lambda_functions ]
   source = "./modules/api-gateway"
   api_name = var.api_name
   api_description = var.api_description
   stage_name = var.stage_name
+
+  lambda_function_arns = {
+    for name, lambda in module.lambda_functions : name => lambda.function_arn
+  }
 }
 
 # =============== Frontend Build =====================
