@@ -1,20 +1,28 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useBetween } from "use-between";
 import { apiGet } from "./api";
 
 const useAuth = () => {
-  const [userInfo, setUserInfo] = useState(() => {
-    const sub = localStorage.getItem("sub");
-    const response = apiGet(`/users/${sub}`);
-    return response.data;
-  });
+  const [userInfo, setUserInfo] = useState(null);
+
+  useEffect(() => {
+    const fetchUserInfo = async () => {
+      const sub = localStorage.getItem("sub");
+      if (sub) {
+        try {
+          const response = await apiGet(`/users/${sub}`);
+          setUserInfo(response.data);
+        } catch (error) {
+          console.error("Error fetching user info:", error);
+        }
+      }
+    };
+
+    fetchUserInfo();
+  }, []);
 
   const getAccessToken = () => {
     return localStorage.getItem("accessToken");
-  };
-
-  const getUserName = () => {
-    return localStorage.getItem("userName");
   };
 
   const setAccessToken = async (token) => {
@@ -37,7 +45,6 @@ const useAuth = () => {
   return {
     getAccessToken,
     setAccessToken,
-    getUserName,
     userInfo,
     setUserInfo,
     handleLogout,
