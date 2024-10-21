@@ -101,9 +101,9 @@ module "cognito" {
 
 
 # ================= Lambda layer =================
-resource "aws_lambda_layer_version" "mysql_dependencies" {
+resource "aws_lambda_layer_version" "common_dependencies" {
   filename   = "${path.module}/lambda_layer.zip"
-  layer_name = "mysql-dependencies"
+  layer_name = "common_dependencies"
 
   compatible_runtimes = ["nodejs18.x", "nodejs20.x"]
 
