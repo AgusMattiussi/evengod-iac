@@ -133,6 +133,7 @@ module "lambda_functions" {
     DB_PASSWORD    = var.rds_db_password
     DB_NAME        = var.rds_db_name
     S3_BUCKET_NAME = "${var.images_bucket_name}-${random_string.random_suffix.result}"
+    USER_POOL_ID   = module.cognito.id
   }
 }
 
