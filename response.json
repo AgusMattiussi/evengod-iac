@@ -1,1 +1,1 @@
-{"statusCode":500,"body":"\"Error setting up schema: Access denied for user 'admin'@'10.0.2.73' (using password: NO)\""}
+{"statusCode":200,"body":"\"Schema setup completed successfully\""}
