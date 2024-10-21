@@ -5,7 +5,7 @@
     "version" : "2024-09-23T17:14:53Z"
   },
   "servers" : [ {
-    "url" : "https://vn3twq8oi4.execute-api.us-east-1.amazonaws.com/{basePath}",
+    "url" : "https://mfesvi0wch.execute-api.us-east-1.amazonaws.com/{basePath}",
     "variables" : {
       "basePath" : {
         "default" : "prod"
@@ -611,6 +611,104 @@
         }
       }
     },
+    "/categories/{id}" : {
+      "get" : {
+        "parameters" : [ {
+          "name" : "id",
+          "in" : "path",
+          "required" : true,
+          "schema" : {
+            "type" : "string"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "200 response",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/Empty"
+                }
+              }
+            }
+          }
+        },
+        "x-amazon-apigateway-integration" : {
+          "httpMethod" : "POST",
+          "uri" : "arn:aws:apigateway:us-east-1:lambda:path/2015-03-31/functions/arn:aws:lambda:us-east-1:595208992199:function:getCategoryById/invocations",
+          "responses" : {
+            "default" : {
+              "statusCode" : "200"
+            }
+          },
+          "requestTemplates" : {
+            "application/json" : "{\n    \"id\": \"$input.params('id')\"\n}"
+          },
+          "passthroughBehavior" : "when_no_templates",
+          "cacheNamespace" : "x6paqk",
+          "timeoutInMillis" : 29000,
+          "cacheKeyParameters" : [ "method.request.path.id" ],
+          "contentHandling" : "CONVERT_TO_TEXT",
+          "type" : "aws_proxy"
+        }
+      },
+      "options" : {
+        "parameters" : [ {
+          "name" : "id",
+          "in" : "path",
+          "required" : true,
+          "schema" : {
+            "type" : "string"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "200 response",
+            "headers" : {
+              "Access-Control-Allow-Origin" : {
+                "schema" : {
+                  "type" : "string"
+                }
+              },
+              "Access-Control-Allow-Methods" : {
+                "schema" : {
+                  "type" : "string"
+                }
+              },
+              "Access-Control-Allow-Headers" : {
+                "schema" : {
+                  "type" : "string"
+                }
+              }
+            },
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/Empty"
+                }
+              }
+            }
+          }
+        },
+        "x-amazon-apigateway-integration" : {
+          "responses" : {
+            "default" : {
+              "statusCode" : "200",
+              "responseParameters" : {
+                "method.response.header.Access-Control-Allow-Methods" : "'DELETE,GET,HEAD,OPTIONS,PATCH,POST,PUT'",
+                "method.response.header.Access-Control-Allow-Headers" : "'Content-Type,Authorization,X-Amz-Date,X-Api-Key,X-Amz-Security-Token'",
+                "method.response.header.Access-Control-Allow-Origin" : "'*'"
+              }
+            }
+          },
+          "requestTemplates" : {
+            "application/json" : "{\"statusCode\": 200}"
+          },
+          "passthroughBehavior" : "when_no_match",
+          "type" : "mock"
+        }
+      }
+    },
     "/users/{id}" : {
       "get" : {
         "parameters" : [ {
@@ -799,7 +897,7 @@
         }
       }
     },
-    "/categories/{id}" : {
+    "/inscriptions/{id}" : {
       "get" : {
         "parameters" : [ {
           "name" : "id",
@@ -823,21 +921,65 @@
         },
         "x-amazon-apigateway-integration" : {
           "httpMethod" : "POST",
-          "uri" : "arn:aws:apigateway:us-east-1:lambda:path/2015-03-31/functions/arn:aws:lambda:us-east-1:595208992199:function:getCategoryById/invocations",
+          "uri" : "arn:aws:apigateway:us-east-1:lambda:path/2015-03-31/functions/arn:aws:lambda:us-east-1:595208992199:function:getInscriptionById/invocations",
           "responses" : {
             "default" : {
               "statusCode" : "200"
             }
           },
-          "requestTemplates" : {
-            "application/json" : "{\n    \"id\": \"$input.params('id')\"\n}"
-          },
-          "passthroughBehavior" : "when_no_templates",
-          "cacheNamespace" : "x6paqk",
+          "passthroughBehavior" : "when_no_match",
+          "cacheNamespace" : "5rj5jd",
           "timeoutInMillis" : 29000,
           "cacheKeyParameters" : [ "method.request.path.id" ],
           "contentHandling" : "CONVERT_TO_TEXT",
           "type" : "aws_proxy"
+        }
+      },
+      "put" : {
+        "parameters" : [ {
+          "name" : "id",
+          "in" : "path",
+          "required" : true,
+          "schema" : {
+            "type" : "string"
+          }
+        } ],
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/InscriptionState"
+              }
+            }
+          },
+          "required" : true
+        },
+        "responses" : {
+          "200" : {
+            "description" : "200 response",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/Empty"
+                }
+              }
+            }
+          }
+        },
+        "x-amazon-apigateway-integration" : {
+          "httpMethod" : "POST",
+          "uri" : "arn:aws:apigateway:us-east-1:lambda:path/2015-03-31/functions/arn:aws:lambda:us-east-1:595208992199:function:editInscription/invocations",
+          "responses" : {
+            "default" : {
+              "statusCode" : "200"
+            }
+          },
+          "passthroughBehavior" : "when_no_match",
+          "cacheNamespace" : "5rj5jd",
+          "timeoutInMillis" : 29000,
+          "cacheKeyParameters" : [ "method.request.path.id" ],
+          "contentHandling" : "CONVERT_TO_TEXT",
+          "type" : "aws"
         }
       },
       "options" : {
@@ -1045,155 +1187,9 @@
         }
       }
     },
-    "/inscriptions/{id}" : {
-      "get" : {
-        "parameters" : [ {
-          "name" : "id",
-          "in" : "path",
-          "required" : true,
-          "schema" : {
-            "type" : "string"
-          }
-        } ],
-        "responses" : {
-          "200" : {
-            "description" : "200 response",
-            "content" : {
-              "application/json" : {
-                "schema" : {
-                  "$ref" : "#/components/schemas/Empty"
-                }
-              }
-            }
-          }
-        },
-        "x-amazon-apigateway-integration" : {
-          "httpMethod" : "POST",
-          "uri" : "arn:aws:apigateway:us-east-1:lambda:path/2015-03-31/functions/arn:aws:lambda:us-east-1:595208992199:function:getInscriptionById/invocations",
-          "responses" : {
-            "default" : {
-              "statusCode" : "200"
-            }
-          },
-          "passthroughBehavior" : "when_no_match",
-          "cacheNamespace" : "5rj5jd",
-          "timeoutInMillis" : 29000,
-          "cacheKeyParameters" : [ "method.request.path.id" ],
-          "contentHandling" : "CONVERT_TO_TEXT",
-          "type" : "aws_proxy"
-        }
-      },
-      "put" : {
-        "parameters" : [ {
-          "name" : "id",
-          "in" : "path",
-          "required" : true,
-          "schema" : {
-            "type" : "string"
-          }
-        } ],
-        "requestBody" : {
-          "content" : {
-            "application/json" : {
-              "schema" : {
-                "$ref" : "#/components/schemas/InscriptionState"
-              }
-            }
-          },
-          "required" : true
-        },
-        "responses" : {
-          "200" : {
-            "description" : "200 response",
-            "content" : {
-              "application/json" : {
-                "schema" : {
-                  "$ref" : "#/components/schemas/Empty"
-                }
-              }
-            }
-          }
-        },
-        "x-amazon-apigateway-integration" : {
-          "httpMethod" : "POST",
-          "uri" : "arn:aws:apigateway:us-east-1:lambda:path/2015-03-31/functions/arn:aws:lambda:us-east-1:595208992199:function:editInscription/invocations",
-          "responses" : {
-            "default" : {
-              "statusCode" : "200"
-            }
-          },
-          "passthroughBehavior" : "when_no_match",
-          "cacheNamespace" : "5rj5jd",
-          "timeoutInMillis" : 29000,
-          "cacheKeyParameters" : [ "method.request.path.id" ],
-          "contentHandling" : "CONVERT_TO_TEXT",
-          "type" : "aws"
-        }
-      },
-      "options" : {
-        "parameters" : [ {
-          "name" : "id",
-          "in" : "path",
-          "required" : true,
-          "schema" : {
-            "type" : "string"
-          }
-        } ],
-        "responses" : {
-          "200" : {
-            "description" : "200 response",
-            "headers" : {
-              "Access-Control-Allow-Origin" : {
-                "schema" : {
-                  "type" : "string"
-                }
-              },
-              "Access-Control-Allow-Methods" : {
-                "schema" : {
-                  "type" : "string"
-                }
-              },
-              "Access-Control-Allow-Headers" : {
-                "schema" : {
-                  "type" : "string"
-                }
-              }
-            },
-            "content" : {
-              "application/json" : {
-                "schema" : {
-                  "$ref" : "#/components/schemas/Empty"
-                }
-              }
-            }
-          }
-        },
-        "x-amazon-apigateway-integration" : {
-          "responses" : {
-            "default" : {
-              "statusCode" : "200",
-              "responseParameters" : {
-                "method.response.header.Access-Control-Allow-Methods" : "'DELETE,GET,HEAD,OPTIONS,PATCH,POST,PUT'",
-                "method.response.header.Access-Control-Allow-Headers" : "'Content-Type,Authorization,X-Amz-Date,X-Api-Key,X-Amz-Security-Token'",
-                "method.response.header.Access-Control-Allow-Origin" : "'*'"
-              }
-            }
-          },
-          "requestTemplates" : {
-            "application/json" : "{\"statusCode\": 200}"
-          },
-          "passthroughBehavior" : "when_no_match",
-          "type" : "mock"
-        }
-      }
-    },
     "/categories" : {
       "get" : {
         "responses" : {
-          "500" : {
-            "description" : "500 response",
-            "content" : { }
-          },
           "200" : {
             "description" : "200 response",
             "content" : {
@@ -1312,12 +1308,9 @@
       },
       "Image" : {
         "title" : "Image",
-        "required" : [ "data", "fileName" ],
+        "required" : [ "data" ],
         "type" : "object",
         "properties" : {
-          "fileName" : {
-            "type" : "string"
-          },
           "data" : {
             "type" : "string"
           }
