@@ -1,10 +1,12 @@
 import { useState } from "react";
 import { useBetween } from "use-between";
+import { apiGet } from "./api";
 
 const useAuth = () => {
   const [userInfo, setUserInfo] = useState(() => {
-    const token = localStorage.getItem("accessToken");
-    return token;
+    const sub = localStorage.getItem("sub");
+    const response = apiGet(`/users/${sub}`);
+    return response.data;
   });
 
   const getAccessToken = () => {
@@ -15,17 +17,14 @@ const useAuth = () => {
     return localStorage.getItem("userName");
   };
 
-  const setAccessToken = (token) => {
+  const setAccessToken = async (token) => {
     if (token) {
-      localStorage.setItem("accessToken", token);
-      setUserInfo(token);
+      const sub = localStorage.getItem("sub");
+      const response = await apiGet(`/users/${sub}`);
+      setUserInfo(response.data);
     } else {
       localStorage.removeItem("accessToken");
     }
-  };
-
-  const setUserName = (name) => {
-    localStorage.setItem("userName", name);
   };
 
   const handleLogout = () => {
@@ -39,7 +38,6 @@ const useAuth = () => {
     getAccessToken,
     setAccessToken,
     getUserName,
-    setUserName,
     userInfo,
     setUserInfo,
     handleLogout,
