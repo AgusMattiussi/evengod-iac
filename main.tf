@@ -96,6 +96,8 @@ module "cognito" {
   
   domain          = "${var.cognito_domain}-${random_string.random_suffix.result}"
   user_pool_name  = var.user_pool_name
+  google_client_id = var.google_client_id
+  google_client_secret = var.google_client_secret
 
 }
 

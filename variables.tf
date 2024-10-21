@@ -73,6 +73,16 @@ variable "cognito_domain" {
   type        = string
 }
 
+variable "google_client_id" {
+  description = "value of the google client id"
+  type        = string
+}
+
+variable "google_client_secret" {
+  description = "value of the google client secret"
+  type        = string
+}
+
 variable "user_pool_name" {
   description = "Name of the Cognito user pool"
   type        = string

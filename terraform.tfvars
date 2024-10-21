@@ -21,8 +21,10 @@ rds_db_password = "admin123"
 vpc_endpoint_s3_name = "s3-images-vpc-endpoint"
 
 # cognito
-cognito_domain         = "evengod"
-user_pool_name = "evengod-user-pool"
+cognito_domain          = "evengod"
+user_pool_name          = "evengod-user-pool"
+google_client_id        = "102897822622-j0m36vpo56fqetqb0sbf2k9rtv6tp9m7.apps.googleusercontent.com"
+google_client_secret    = "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"
 
 # API GW
 api_name = "evengod-rest-api"
