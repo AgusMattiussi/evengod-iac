@@ -7,7 +7,7 @@ import { useSharedAuth } from "../services/auth";
 
 const Navbar = () => {
   const navigate = useNavigate();
-  const { handleLogout, getAccessToken, userInfo } = useSharedAuth();
+  const { handleLogout, getAccessToken, userInfo, getSub } = useSharedAuth();
 
   const [userName, setUserName] = useState("");
 
@@ -28,6 +28,7 @@ const Navbar = () => {
   };
 
   const accessToken = getAccessToken();
+  const sub = getSub();
 
   return (
     <header className="header">
@@ -79,7 +80,7 @@ const Navbar = () => {
           <>
             <div
               className="user-info cursor-pointer"
-              onClick={() => navigate(`/profile/${accessToken}`)}
+              onClick={() => navigate(`/profile/${sub}`)}
             >
               <img
                 src={defaultProfile}

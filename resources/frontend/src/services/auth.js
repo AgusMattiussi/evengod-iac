@@ -35,6 +35,10 @@ const useAuth = () => {
     }
   };
 
+  const getSub = () => {
+    return localStorage.getItem("sub");
+  };
+
   const handleLogout = () => {
     localStorage.removeItem("idToken");
     localStorage.removeItem("accessToken");
@@ -47,6 +51,7 @@ const useAuth = () => {
     setAccessToken,
     userInfo,
     setUserInfo,
+    getSub,
     handleLogout,
   };
 };
