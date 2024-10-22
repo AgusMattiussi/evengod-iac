@@ -9,16 +9,30 @@ const api = axios.create({
   },
 });
 
+const getAuthHeaders = () => {
+  const token = localStorage.getItem("idToken");
+  return token ? { Authorization: `Bearer ${token}` } : {};
+};
+
 export const apiGet = (endpoint, params = {}) => {
-  return api.get(endpoint, { params });
+  const headers = getAuthHeaders();
+  return api.get(endpoint, { params, headers });
 };
 
 export const apiPost = (endpoint, data = {}, config = {}) => {
-  return api.post(endpoint, data, config);
+  const headers = {
+    ...getAuthHeaders(),
+    ...config.headers,
+  };
+  return api.post(endpoint, data, { ...config, headers });
 };
 
 export const apiPut = (endpoint, data = {}, config = {}) => {
-  return api.put(endpoint, data, config);
+  const headers = {
+    ...getAuthHeaders(),
+    ...config.headers,
+  };
+  return api.put(endpoint, data, { ...config, headers });
 };
 
 export const apiDelete = (endpoint, config = {}) => {
@@ -40,6 +54,7 @@ export const apiUpload = (endpoint, file, additionalData = {}) => {
   return api.post(endpoint, formData, {
     headers: {
       "Content-Type": "multipart/form-data",
+      ...getAuthHeaders(),
     },
   });
 };
