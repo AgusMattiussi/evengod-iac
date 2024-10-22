@@ -1,5 +1,6 @@
 const AWS = require("aws-sdk");
 const mysql = require("mysql2/promise");
+const jwt = require("jsonwebtoken");
 
 const s3 = new AWS.S3();
 
