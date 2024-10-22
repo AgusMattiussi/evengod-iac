@@ -13,8 +13,7 @@ exports.handler = async (event, context) => {
   let connection;
 
   try {
-    const categoryId =
-      event.params && event.params.path && event.params.path.id;
+    const categoryId = event.pathParameters.categoryId;
 
     if (!categoryId) {
       return {
