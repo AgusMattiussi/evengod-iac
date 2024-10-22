@@ -43,6 +43,7 @@ const useAuth = () => {
     localStorage.removeItem("idToken");
     localStorage.removeItem("accessToken");
     localStorage.removeItem("refreshToken");
+    localStorage.removeItem("sub");
     setUserInfo(null);
   };
 

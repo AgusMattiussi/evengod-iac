@@ -33,6 +33,7 @@ export const login = async (email, password) => {
         "refreshToken",
         AuthenticationResult.RefreshToken || ""
       );
+      localStorage.setItem("idToken", AuthenticationResult.IdToken || "");
       localStorage.setItem(
         "sub",
         jwtDecode(AuthenticationResult.AccessToken).sub || ""
