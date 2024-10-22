@@ -58,11 +58,44 @@ resource "aws_cognito_user_pool" "this" {
             max_length = 100
         }
     }
+
+    
     
 }
 
-
 resource "aws_cognito_user_pool_domain" "domain" {
-  domain       = var.domain
-  user_pool_id = aws_cognito_user_pool.this.id
+    domain       = var.domain
+    user_pool_id = aws_cognito_user_pool.this.id
+}
+
+resource "aws_cognito_user_pool_client" "userpool_client" {
+  name = "evengod-client"
+    user_pool_id = aws_cognito_user_pool.this.id
+    # TODO: Actualizar
+    callback_urls = [ "http://localhost" ]
+    allowed_oauth_flows_user_pool_client = true
+    allowed_oauth_flows = ["implicit"]
+    allowed_oauth_scopes = [ "email", "openid", "aws.cognito.signin.user.admin" ]
+    explicit_auth_flows = [ "ALLOW_CUSTOM_AUTH", "ALLOW_USER_SRP_AUTH", "ALLOW_REFRESH_TOKEN_AUTH" ]
+    generate_secret = true
+    # logout_urls = [  ]
+    supported_identity_providers = [ "Google", "COGNITO" ]
+}
+
+
+# =================== Google Log In =======================
+resource "aws_cognito_identity_provider" "google" {
+    provider_name = "Google"
+    provider_type = "Google"
+    user_pool_id  = aws_cognito_user_pool.this.id
+
+    provider_details = {
+        client_id     = var.google_client_id
+        client_secret = var.google_client_secret
+        authorize_scopes = "email profile openid"
+    }
+
+    attribute_mapping = {
+        name    = "name"
+    }
 }

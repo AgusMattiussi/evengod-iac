@@ -1,42 +1,42 @@
-import React, { useState, useEffect, useCallback } from "react"
-import { apiGet } from "../services/api"
-import { useNavigate, useParams } from "react-router-dom"
-import { HttpStatusCode } from "axios"
-import Navbar from "../components/navbar"
-import { Loader } from "../components/loader"
-import defaultProfileImage from "../images/defaultProfile.jpg"
+import React, { useState, useEffect, useCallback } from "react";
+import { apiGet } from "../services/api";
+import { useNavigate, useParams } from "react-router-dom";
+import { HttpStatusCode } from "axios";
+import Navbar from "../components/navbar";
+import { Loader } from "../components/loader";
+import defaultProfileImage from "../images/defaultProfile.jpg";
 
 const Profile = () => {
-  const navigate = useNavigate()
+  const navigate = useNavigate();
 
-  const [user, setUser] = useState({})
-  const { id } = useParams()
-  const [loading, setLoading] = useState(true)
+  const [user, setUser] = useState({});
+  const { id } = useParams();
+  const [loading, setLoading] = useState(true);
 
   const fetchEvent = useCallback(async () => {
-    setLoading(true)
+    setLoading(true);
 
     try {
-      const response = await apiGet(`/users/${id}`)
+      const response = await apiGet(`/users/${id}`);
       if (response.status === HttpStatusCode.InternalServerError) {
-        navigate("/500")
+        navigate("/500");
       } else if (response.status === HttpStatusCode.NoContent) {
-        setUser({})
+        setUser({});
       } else {
-        setUser(response.data)
+        setUser(response.data);
       }
     } catch (error) {
-      console.error("Error fetching event:", error)
+      console.error("Error fetching event:", error);
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }, [])
+  }, []);
 
   useEffect(() => {
     if (loading) {
-      fetchEvent()
+      fetchEvent();
     }
-  }, [])
+  }, []);
 
   return (
     <>
@@ -49,10 +49,14 @@ const Profile = () => {
             <div className="container mx-auto px-4 py-8">
               <main className="grid grid-cols-1 lg:grid-cols-3">
                 <div className="lg:col-span-1 mx-10">
-                  <img src={defaultProfileImage} alt="Conference" className="size-64 rounded-lg shadow-lg" />
+                  <img
+                    src={defaultProfileImage}
+                    alt="Conference"
+                    className="size-64 rounded-lg shadow-lg"
+                  />
                 </div>
                 <div className="lg:col-span-2">
-                  <h1 className="text-5xl font-bold mb-4">{user.username}</h1>
+                  <h1 className="text-5xl font-bold mb-4">{user.name}</h1>
                   <p className="mb-6text-gray-400">{user.description}</p>
                   {/*<p className="mb-3 text-xl text-gray-400">Tópicos de interes:</p>
                  <div className="flex flex-wrap gap-2">
@@ -69,7 +73,7 @@ const Profile = () => {
         )}
       </div>
     </>
-  )
-}
+  );
+};
 
-export default Profile
+export default Profile;

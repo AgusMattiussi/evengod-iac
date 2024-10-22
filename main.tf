@@ -96,7 +96,8 @@ module "cognito" {
   
   domain          = "${var.cognito_domain}-${random_string.random_suffix.result}"
   user_pool_name  = var.user_pool_name
-
+  google_client_id = var.google_client_id
+  google_client_secret = var.google_client_secret
 }
 
 
@@ -158,6 +159,7 @@ module "api_gateway" {
   api_name = var.api_name
   api_description = var.api_description
   stage_name = var.stage_name
+  cognito_user_pool_arn = module.cognito.arn
 
   lambda_function_arns = {
     for name, lambda in module.lambda_functions : name => lambda.function_arn

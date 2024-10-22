@@ -15,6 +15,11 @@ variable "stage_name" {
   default     = "dev"
 }
 
+variable "cognito_user_pool_arn" {
+  description = "ARN del User Pool de Cognito para utilizarlo como Authorizer"
+  type        = string
+}
+
 variable "lambda_function_arns" {
   type = map(string)
 }

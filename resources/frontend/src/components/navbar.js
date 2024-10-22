@@ -1,13 +1,21 @@
-import React from "react"
-import { useNavigate } from "react-router-dom"
-import "./navbar.css"
-import defaultProfile from "../images/defaultProfile.jpg"
-import { Search, LogOut } from "lucide-react"
-import { useSharedAuth } from "../services/auth"
+import React, { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import "./navbar.css";
+import defaultProfile from "../images/defaultProfile.jpg";
+import { Search, LogOut } from "lucide-react";
+import { useSharedAuth } from "../services/auth";
 
 const Navbar = () => {
-  const navigate = useNavigate()
-  const { handleLogout, getAccessToken, getUserName } = useSharedAuth()
+  const navigate = useNavigate();
+  const { handleLogout, getAccessToken, userInfo, getSub } = useSharedAuth();
+
+  const [userName, setUserName] = useState("");
+
+  useEffect(() => {
+    if (userInfo) {
+      setUserName(userInfo.name);
+    }
+  }, [userInfo]);
 
   // const [isSearchVisible, setIsSearchVisible] = useState(false)
   // const toggleSearch = () => {
@@ -15,18 +23,26 @@ const Navbar = () => {
   // }
 
   const handleLogoutButton = () => {
-    handleLogout()
-    navigate("/login")
-  }
+    handleLogout();
+    navigate("/login");
+  };
 
-  const username = getUserName()
-  const accessToken = getAccessToken()
+  const accessToken = getAccessToken();
+  const sub = getSub();
 
   return (
     <header className="header">
       <div className="header-left">
-        <img src="/logo.png" alt="EvenGOD Logo" className="logo cursor-pointer" onClick={() => navigate(`/`)} />
-        <h1 className="text-3xl font-bold cursor-pointer" onClick={() => navigate(`/`)}>
+        <img
+          src="/logo.png"
+          alt="EvenGOD Logo"
+          className="logo cursor-pointer"
+          onClick={() => navigate(`/`)}
+        />
+        <h1
+          className="text-3xl font-bold cursor-pointer"
+          onClick={() => navigate(`/`)}
+        >
           EvenGOD
         </h1>
         <nav>
@@ -37,10 +53,14 @@ const Navbar = () => {
             {accessToken ? (
               <>
                 <li>
-                  <button onClick={() => navigate("/my-events")}>Mis Eventos</button>
+                  <button onClick={() => navigate("/my-events")}>
+                    Mis Eventos
+                  </button>
                 </li>
                 <li>
-                  <button onClick={() => navigate("/create-event")}>Crear Evento</button>
+                  <button onClick={() => navigate("/create-event")}>
+                    Crear Evento
+                  </button>
                 </li>
               </>
             ) : (
@@ -58,22 +78,35 @@ const Navbar = () => {
         </div> */}
         {accessToken ? (
           <>
-            <div className="user-info cursor-pointer" onClick={() => navigate(`/profile/${accessToken}`)}>
-              <img src={defaultProfile} alt="User Avatar" className="user-avatar" />
-              <span className="username">{username}</span>
+            <div
+              className="user-info cursor-pointer"
+              onClick={() => navigate(`/profile/${sub}`)}
+            >
+              <img
+                src={defaultProfile}
+                alt="User Avatar"
+                className="user-avatar"
+              />
+              <span className="username">{userName}</span>
             </div>
-            <button className="flex items-center ml-4 transition" onClick={handleLogoutButton}>
+            <button
+              className="flex items-center ml-4 transition"
+              onClick={handleLogoutButton}
+            >
               <LogOut size={24} className="mr-1 search-icon" />
             </button>
           </>
         ) : (
-          <button onClick={() => navigate("/login")} className="flex items-center ml-4 transition">
+          <button
+            onClick={() => navigate("/login")}
+            className="flex items-center ml-4 transition"
+          >
             Iniciar Sesión
           </button>
         )}
       </div>
     </header>
-  )
-}
+  );
+};
 
-export default Navbar
+export default Navbar;

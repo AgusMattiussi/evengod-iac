@@ -1,31 +1,42 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useBetween } from "use-between";
+import { apiGet } from "./api";
 
 const useAuth = () => {
-  const [userInfo, setUserInfo] = useState(() => {
-    const token = localStorage.getItem("accessToken");
-    return token;
-  });
+  const [userInfo, setUserInfo] = useState(null);
+
+  useEffect(() => {
+    const fetchUserInfo = async () => {
+      const sub = localStorage.getItem("sub");
+      if (sub) {
+        try {
+          const response = await apiGet(`/users/${sub}`);
+          setUserInfo(response.data);
+        } catch (error) {
+          console.error("Error fetching user info:", error);
+        }
+      }
+    };
+
+    fetchUserInfo();
+  }, []);
 
   const getAccessToken = () => {
     return localStorage.getItem("accessToken");
   };
 
-  const getUserName = () => {
-    return localStorage.getItem("userName");
-  };
-
-  const setAccessToken = (token) => {
+  const setAccessToken = async (token) => {
     if (token) {
-      localStorage.setItem("accessToken", token);
-      setUserInfo(token);
+      const sub = localStorage.getItem("sub");
+      const response = await apiGet(`/users/${sub}`);
+      setUserInfo(response.data);
     } else {
       localStorage.removeItem("accessToken");
     }
   };
 
-  const setUserName = (name) => {
-    localStorage.setItem("userName", name);
+  const getSub = () => {
+    return localStorage.getItem("sub");
   };
 
   const handleLogout = () => {
@@ -38,10 +49,9 @@ const useAuth = () => {
   return {
     getAccessToken,
     setAccessToken,
-    getUserName,
-    setUserName,
     userInfo,
     setUserInfo,
+    getSub,
     handleLogout,
   };
 };

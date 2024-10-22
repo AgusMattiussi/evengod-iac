@@ -1,42 +1,32 @@
-import React, { useState } from "react"
-import Header from "../components/header"
-import { useNavigate } from "react-router-dom"
-import { apiPost } from "../services/api"
-
-// const topics = ["Blockchain", "AI", "DevOps", "Data Science", "Ciberseguridad", "Cloud Computing", "Big Data"]
+import React, { useState } from "react";
+import Header from "../components/header";
+import { useNavigate } from "react-router-dom";
+import { apiPost } from "../services/api";
 
 const SignUp = () => {
-  const navigate = useNavigate()
-  const [username, setUsername] = useState("")
-  const [email, setEmail] = useState("")
-  const [password, setPassword] = useState("")
-
-  // const [selectedTopics, setSelectedTopics] = useState([])
-  // const handleTopicClick = (topic) => {
-  //   setSelectedTopics((prevTopics) =>
-  //     prevTopics.includes(topic) ? prevTopics.filter((t) => t !== topic) : [...prevTopics, topic],
-  //   )
-  // }
+  const navigate = useNavigate();
+  const [username, setUsername] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
 
   const handleSubmit = async (e) => {
-    e.preventDefault()
+    e.preventDefault();
 
     try {
       const data = {
         username,
         email,
         password,
-        // topics: selectedTopics,
-      }
+      };
 
-      await apiPost("/users", data)
+      await apiPost("/users", data);
 
       // Navigate to login or success page after successful registration
-      navigate("/login")
+      navigate("/login");
     } catch (error) {
-      console.error("Error during registration:", error)
+      console.error("Error during registration:", error);
     }
-  }
+  };
 
   return (
     <>
@@ -46,7 +36,10 @@ const SignUp = () => {
           <h2 className="text-2xl font-bold text-center mb-6">Registrate</h2>
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
-              <label htmlFor="email" className="block text-sm font-medium text-gray-700">
+              <label
+                htmlFor="email"
+                className="block text-sm font-medium text-gray-700"
+              >
                 Nombre de Usuario
               </label>
               <input
@@ -59,7 +52,10 @@ const SignUp = () => {
               />
             </div>
             <div>
-              <label htmlFor="email" className="block text-sm font-medium text-gray-700">
+              <label
+                htmlFor="email"
+                className="block text-sm font-medium text-gray-700"
+              >
                 Email
               </label>
               <input
@@ -73,7 +69,10 @@ const SignUp = () => {
               />
             </div>
             <div>
-              <label htmlFor="password" className="block text-sm font-medium text-gray-700">
+              <label
+                htmlFor="password"
+                className="block text-sm font-medium text-gray-700"
+              >
                 Contraseña
               </label>
               <input
@@ -111,14 +110,17 @@ const SignUp = () => {
             </button>
           </form>
           <div className="mt-4 text-center">
-            <button onClick={() => navigate("/login")} className="text-sm text-indigo-600 hover:text-blue-light">
+            <button
+              onClick={() => navigate("/login")}
+              className="text-sm text-indigo-600 hover:text-blue-light"
+            >
               ¿Ya tienes cuenta? Inicia sesión aquí
             </button>
           </div>
         </div>
       </div>
     </>
-  )
-}
+  );
+};
 
-export default SignUp
+export default SignUp;
