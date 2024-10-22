@@ -72,10 +72,8 @@ const EventForm = () => {
       };
       const response = await apiPost("/events", data);
       const eventId = response.data.eventId;
-      console.log(imageBase64);
       if (imageBase64 !== "") {
         const imageData = {
-          fileName: `image${eventId}`,
           data: imageBase64,
         };
         await apiPut(`/events/${eventId}/image`, imageData);
