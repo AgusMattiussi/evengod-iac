@@ -122,7 +122,7 @@ module "lambda_functions" {
   runtime                = each.value.runtime
   source_dir             = "${local.lambdas_dir}/${each.value.source_dir}"
   role                   = data.aws_iam_role.lab_role.arn
-  layer_arn              = aws_lambda_layer_version.mysql_dependencies.arn
+  layer_arn              = aws_lambda_layer_version.common_dependencies.arn
   vpc_subnet_ids         = data.aws_subnets.lambdas_subnets.ids
   vpc_security_group_ids = [module.security_groups.lambda_sg_id]
 
