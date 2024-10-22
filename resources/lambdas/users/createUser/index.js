@@ -1,60 +1,87 @@
-const AWS = require('aws-sdk');
+const AWS = require("aws-sdk");
+
+AWS.config.update({
+  region: "us-east-1",
+});
+
 const cognito = new AWS.CognitoIdentityServiceProvider();
 
-exports.handler = async (event) => {
+const AmazonCognitoIdentity = require("amazon-cognito-identity-js");
 
+const poolData = {
+  UserPoolId: process.env.USER_POOL_ID,
+  ClientId: "3qjgvnbhe51snu1cu9pniukjn5",
+};
+
+const userPool = new AmazonCognitoIdentity.CognitoUserPool(poolData);
+
+exports.handler = async (event) => {
   try {
-    console.log(event);
+    console.log("Received event:", event);
     const { username, email, password } = JSON.parse(event.body);
 
-    // Validate input
-    if (!username|| !email || !password) {
+    if (!username || !email || !password) {
       return {
         statusCode: 400,
-        body: JSON.stringify({ message: 'Missing required fields' }),
+        body: JSON.stringify({ message: "Missing required fields" }),
       };
     }
 
-    const params = {
-      UserPoolId: process.env.USER_POOL_ID,
-      Username: email,
-      UserAttributes: [
-        { Name: 'email', Value: email },
-        { Name: 'email_verified', Value: 'true' },
-        { Name: 'name', Value: username },
-      ],
-      MessageAction: 'SUPPRESS',
-    };
+    const attributeList = [
+      new AmazonCognitoIdentity.CognitoUserAttribute({
+        Name: "email",
+        Value: email,
+      }),
+      new AmazonCognitoIdentity.CognitoUserAttribute({
+        Name: "name",
+        Value: username,
+      }),
+    ];
 
-    const result = await cognito.adminCreateUser(params).promise();
+    const result = await signUpUser(email, password, attributeList);
 
-    await cognito.adminSetUserPassword({
-      UserPoolId: process.env.USER_POOL_ID,
-      Username: email,
-      Password: password,
-      Permanent: true,
-    }).promise();
-
+    await cognito
+      .adminConfirmSignUp({
+        UserPoolId: poolData.UserPoolId,
+        Username: email,
+      })
+      .promise();
 
     return {
       statusCode: 201,
       headers: {
-        'Content-Type': 'application/json',
-        'Access-Control-Allow-Origin': '*', // Adjust this in production
-        'Access-Control-Allow-Methods': '*',
-        'Access-Control-Allow-Headers': '*',
-        'Access-Control-Expose-Headers': '*'
+        "Content-Type": "application/json",
+        "Access-Control-Allow-Origin": "*", // Adjust this in production
+        "Access-Control-Allow-Methods": "*",
+        "Access-Control-Allow-Headers": "*",
+        "Access-Control-Expose-Headers": "*",
       },
       body: JSON.stringify({
-        message: 'User created successfully',
-        userId: result.insertId,
+        message: "User created successfully",
+        userId: result.userSub, // Cognito returns the userSub as the user ID
       }),
     };
   } catch (error) {
-    console.error('Error:', error);
+    console.error("Error creating user:", error);
     return {
       statusCode: 500,
-      body: JSON.stringify({ message: 'Error creating user', error: error.message }),
+      body: JSON.stringify({
+        message: "Error creating user",
+        error: error.message,
+      }),
     };
   }
 };
+
+// Helper function to handle sign-up process as a promise
+function signUpUser(email, password, attributeList) {
+  return new Promise((resolve, reject) => {
+    userPool.signUp(email, password, attributeList, null, (err, result) => {
+      if (err) {
+        reject(err);
+      } else {
+        resolve(result);
+      }
+    });
+  });
+}

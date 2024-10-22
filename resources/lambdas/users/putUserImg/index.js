@@ -1,29 +1,60 @@
-const AWS = require('aws-sdk');
+const AWS = require("aws-sdk");
 const s3 = new AWS.S3();
 const cognito = new AWS.CognitoIdentityServiceProvider();
 
-exports.handler = async (event) => {
+exports.handler = async (event, context) => {
   try {
-    const pathUserId = event.pathParameters && event.pathParameters.id;
-    const userUuid = event.requestContext.authorizer.claims.sub;
+    console.log("Event", event);
+
+    const authorizationHeader =
+      event.headers.Authorization || event.headers.authorization;
+
+    if (!authorizationHeader) {
+      return {
+        statusCode: 401,
+        body: JSON.stringify({ message: "Authorization header missing" }),
+      };
+    }
+
+    const token = authorizationHeader.split(" ")[1];
+    if (!token) {
+      return {
+        statusCode: 401,
+        body: JSON.stringify({ message: "Invalid Authorization format" }),
+      };
+    }
+
+    const decodedToken = jwt.decode(token);
+
+    if (!decodedToken || !decodedToken.sub) {
+      return {
+        statusCode: 400,
+        body: JSON.stringify({ message: "Invalid token" }),
+      };
+    }
+
+    const userUuid = decodedToken.sub;
 
     if (!userUuid) {
       return {
-          statusCode: 400,
-          body: JSON.stringify({
-              message: "Missing UUID from Cognito",
-          }),
+        statusCode: 400,
+        body: JSON.stringify({
+          message: "Missing UUID from Cognito",
+        }),
       };
-  }
+    }
 
-  if (!pathUserId || pathUserId !== userUuid) {
+    if (!pathUserId || pathUserId !== userUuid) {
       return {
-          statusCode: 400,
-          body: JSON.stringify({
+        statusCode: 400,
+        body: JSON.stringify({
           message: "User ID does not match the authenticated user",
-          }),
+        }),
       };
-  }
+    }
+
+    const pathUserId =
+      event.params && event.params.path && event.pathParameters.id;
 
     const { data } = JSON.parse(event.body);
     const bucketName = process.env.S3_BUCKET_NAME;
@@ -31,7 +62,7 @@ exports.handler = async (event) => {
     if (!data) {
       return {
         statusCode: 400,
-        body: JSON.stringify({ message: 'Missing required fields: data' }),
+        body: JSON.stringify({ message: "Missing required fields: data" }),
       };
     }
 
@@ -39,9 +70,9 @@ exports.handler = async (event) => {
     const s3Params = {
       Bucket: bucketName,
       Key: pathUserId,
-      Body: Buffer.from(data, 'base64'),
-      ContentType: 'image/jpeg',
-      ACL: 'public-read',
+      Body: Buffer.from(data, "base64"),
+      ContentType: "image/jpeg",
+      ACL: "public-read",
     };
 
     const uploadResult = await s3.upload(s3Params).promise();
@@ -49,11 +80,11 @@ exports.handler = async (event) => {
 
     // Update picture URL in Cognito
     const updateParams = {
-      UserPoolId: process.env.USER_POOL_ID, 
+      UserPoolId: process.env.USER_POOL_ID,
       Username: pathUserId,
       UserAttributes: [
         {
-          Name: 'picture',
+          Name: "picture",
           Value: imageUrl,
         },
       ],
@@ -63,13 +94,19 @@ exports.handler = async (event) => {
 
     return {
       statusCode: 200,
-      body: JSON.stringify({ message: 'Image uploaded and URL saved successfully', imageUrl }),
+      body: JSON.stringify({
+        message: "Image uploaded and URL saved successfully",
+        imageUrl,
+      }),
     };
   } catch (error) {
-    console.error('Error uploading image or updating Cognito:', error);
+    console.error("Error uploading image or updating Cognito:", error);
     return {
       statusCode: 500,
-      body: JSON.stringify({ message: 'Error processing request', error: error.message }),
+      body: JSON.stringify({
+        message: "Error processing request",
+        error: error.message,
+      }),
     };
   }
 };

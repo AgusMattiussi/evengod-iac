@@ -8,18 +8,18 @@ const dbConfig = {
   database: process.env.DB_NAME,
 };
 
-exports.handler = async (event) => {
+exports.handler = async (event, context) => {
   let connection;
   try {
     console.log(event);
 
     // Asumimos que el email se pasa en el cuerpo de la solicitud
-    const { email } = JSON.parse(event.body);
+    const userId = event.params && event.params.path && event.params.path.id;
 
-    if (!email) {
+    if (!userId) {
       return {
         statusCode: 400,
-        body: JSON.stringify({ message: 'Email is required' }),
+        body: JSON.stringify({ message: 'UserId is required' }),
       };
     }
 
@@ -28,8 +28,8 @@ exports.handler = async (event) => {
 
     // Ejecutar la consulta para eliminar el usuario
     const [result] = await connection.execute(
-      'DELETE FROM users WHERE email = ?',
-      [email]
+      'DELETE FROM users WHERE id = ?',
+      [userId]
     );
 
     if (result.affectedRows === 0) {
@@ -47,7 +47,7 @@ exports.handler = async (event) => {
       },
       body: JSON.stringify({
         message: 'User eliminated successfully',
-        email: email,
+        userId: userId,
       }),
     };
   } catch (error) {

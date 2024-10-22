@@ -142,7 +142,7 @@ resource "null_resource" "invoke_db" {
   depends_on = [ module.lambda_functions, module.rds_mysql ]
 
   provisioner "local-exec" {
-    command = "aws lambda invoke --function-name ${module.lambda_functions["setupDB"].function_name}"
+    command = "aws lambda invoke --function-name ${module.lambda_functions["setupDB"].function_name} response.json"
   }
 
   triggers = {

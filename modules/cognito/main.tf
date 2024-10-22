@@ -69,15 +69,16 @@ resource "aws_cognito_user_pool_domain" "domain" {
 }
 
 resource "aws_cognito_user_pool_client" "userpool_client" {
-  name = "evengod-client"
+    name = "evengod-client"
     user_pool_id = aws_cognito_user_pool.this.id
     # TODO: Actualizar
     callback_urls = [ "http://localhost" ]
     allowed_oauth_flows_user_pool_client = true
     allowed_oauth_flows = ["implicit"]
     allowed_oauth_scopes = [ "email", "openid", "aws.cognito.signin.user.admin" ]
-    explicit_auth_flows = [ "ALLOW_CUSTOM_AUTH", "ALLOW_USER_SRP_AUTH", "ALLOW_REFRESH_TOKEN_AUTH", "USER_PASSWORD_AUTH" ]
+    explicit_auth_flows = [ "ALLOW_CUSTOM_AUTH", "ALLOW_USER_SRP_AUTH", "ALLOW_REFRESH_TOKEN_AUTH", "ALLOW_USER_PASSWORD_AUTH" ]
     generate_secret = false
+    access_token_validity = 1
     # logout_urls = [  ]
     supported_identity_providers = [ "Google", "COGNITO" ]
 }
