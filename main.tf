@@ -177,12 +177,18 @@ resource "null_resource" "api-gateway-url" {
   provisioner "local-exec" {
     command = "./set-api-gw.sh ${module.api_gateway.invoke_url}"
   }
+  triggers = {
+    always_run = "${timestamp()}"
+  }
 }
 
 resource "null_resource" "client_id" {
   depends_on = [ module.cognito ]
   provisioner "local-exec" {
     command = "./set-client-id.sh ${module.cognito.client_id}"
+  }
+  triggers = {
+    always_run = "${timestamp()}"
   }
 }
 
@@ -192,6 +198,9 @@ resource "null_resource" "frontend_build" {
   provisioner "local-exec" {
     command = "npm install && npm run build"
     working_dir = local.frontend_directory
+  }
+  triggers = {
+    always_run = "${timestamp()}"
   }
 }
 
