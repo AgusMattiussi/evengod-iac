@@ -9,8 +9,8 @@ module "vpc" {
   private_subnet_cidrs = var.private_subnet_cidrs
 }
 
-# ================= VPC Endpoints =================
 
+# ================= VPC Endpoints =================
 module "vpc_endpoints" {
   depends_on = [module.vpc]
 
@@ -41,6 +41,7 @@ module "vpc_endpoints" {
   }
 }
 
+
 # ================= S3 Buckets =================
 resource "random_string" "random_suffix" {
   length  = 8
@@ -60,6 +61,7 @@ module "s3_images" {
   is_website  = false
 }
 
+
 # ================= Security Groups =================
 module "security_groups" {
   source = "./modules/security-groups"
@@ -70,6 +72,7 @@ module "security_groups" {
   vpc_id           = module.vpc.id
 
 }
+
 
 # ================= RDS MySQL =================
 module "rds_mysql" {
@@ -111,6 +114,7 @@ resource "aws_lambda_layer_version" "common_dependencies" {
   source_code_hash = filebase64sha256("${path.module}/lambda_layer.zip")
 }
 
+
 # ================= Lambda functions =================
 module "lambda_functions" {
   depends_on = [module.security_groups, module.rds_mysql, module.s3_images]
@@ -151,7 +155,6 @@ resource "null_resource" "invoke_db" {
 }
 
 
-
 # =============== REST API ===========================
 
 module "api_gateway" {
@@ -170,13 +173,21 @@ module "api_gateway" {
 # =============== Frontend Build =====================
 
 resource "null_resource" "api-gateway-url" {
+  depends_on = [ module.api_gateway ]
   provisioner "local-exec" {
     command = "./set-api-gw.sh ${module.api_gateway.invoke_url}"
   }
 }
 
+resource "null_resource" "client_id" {
+  depends_on = [ module.cognito ]
+  provisioner "local-exec" {
+    command = "./set-client-id.sh ${module.cognito.client_id}"
+  }
+}
+
 resource "null_resource" "frontend_build" {
-  depends_on = [ null_resource.api-gateway-url, module.s3_frontend ]
+  depends_on = [ null_resource.api-gateway-url, module.s3_frontend, null_resource.client_id ]
 
   provisioner "local-exec" {
     command = "npm install && npm run build"
