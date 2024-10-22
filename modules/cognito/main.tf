@@ -81,6 +81,7 @@ resource "aws_cognito_user_pool_client" "userpool_client" {
     access_token_validity = 1
     # logout_urls = [  ]
     supported_identity_providers = [ "Google", "COGNITO" ]
+    depends_on = [ aws_cognito_user_pool_domain.domain ]
 }
 
 
