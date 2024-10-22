@@ -35,8 +35,9 @@ const buildInscriptionQuery = (queryParams) => {
 exports.handler = async (event, context) => {
   let connection;
   try {
+    console.log("Event", event);
     // Obtener los query parameters desde el evento
-    const queryParams = event.params.querystring;
+    const queryParams = event.queryStringParameters || {};
 
     // Construir la consulta de búsqueda
     const { query, params } = buildInscriptionQuery(queryParams);
