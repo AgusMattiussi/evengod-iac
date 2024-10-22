@@ -1,60 +1,60 @@
-import React, { useState, useEffect } from "react"
-import Header from "../components/header"
-import { useNavigate } from "react-router-dom"
-import { apiPost, apiGet, apiPut } from "../services/api"
-import { Loader } from "../components/loader"
-import { HttpStatusCode } from "axios"
-import { useSharedAuth } from "../services/auth"
+import React, { useState, useEffect } from "react";
+import Header from "../components/header";
+import { useNavigate } from "react-router-dom";
+import { apiPost, apiGet, apiPut } from "../services/api";
+import { Loader } from "../components/loader";
+import { HttpStatusCode } from "axios";
+import { useSharedAuth } from "../services/auth";
 
 const EventForm = () => {
-  const navigate = useNavigate()
-  const { getAccessToken } = useSharedAuth()
+  const navigate = useNavigate();
+  const { getAccessToken } = useSharedAuth();
 
-  const [title, setTitle] = useState("")
-  const [description, setDescription] = useState("")
-  const [startDate, setStartDate] = useState("")
-  const [endDate, setEndDate] = useState("")
-  const [modality, setModality] = useState("")
-  const [location, setLocation] = useState("")
-  const [virtualRoomLink, setVirtualRoomLink] = useState("")
-  const [categoryId, setCategoryId] = useState(1)
-  const [imageBase64, setImageBase64] = useState("")
+  const [title, setTitle] = useState("");
+  const [description, setDescription] = useState("");
+  const [startDate, setStartDate] = useState("");
+  const [endDate, setEndDate] = useState("");
+  const [modality, setModality] = useState("");
+  const [location, setLocation] = useState("");
+  const [virtualRoomLink, setVirtualRoomLink] = useState("");
+  const [categoryId, setCategoryId] = useState(1);
+  const [imageBase64, setImageBase64] = useState("");
 
-  const [categories, setCategories] = useState([])
-  const [loading, setLoading] = useState(true)
+  const [categories, setCategories] = useState([]);
+  const [loading, setLoading] = useState(true);
 
   const fetchCategories = async () => {
     try {
-      const response = await apiGet("/categories")
+      const response = await apiGet("/categories");
       if (response.status === HttpStatusCode.InternalServerError) {
-        navigate("/500")
+        navigate("/500");
       } else if (response.status === HttpStatusCode.NoContent) {
-        setCategories([])
+        setCategories([]);
       } else {
-        setCategories(response.data)
+        setCategories(response.data);
       }
     } catch (error) {
-      console.error("Error fetching categories:", error)
+      console.error("Error fetching categories:", error);
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
   useEffect(() => {
     if (loading) {
-      fetchCategories()
+      fetchCategories();
     }
-  }, [])
+  }, []);
 
   const parseToISOString = (dateString) => {
-    const date = new Date(dateString)
-    return date.toISOString() // Añade 00:00:00.000Z
-  }
+    const date = new Date(dateString);
+    return date.toISOString(); // Añade 00:00:00.000Z
+  };
 
   const handleSubmit = async (e) => {
-    e.preventDefault()
-    const isoStartDate = parseToISOString(startDate)
-    const isoEndDate = parseToISOString(endDate)
+    e.preventDefault();
+    const isoStartDate = parseToISOString(startDate);
+    const isoEndDate = parseToISOString(endDate);
     try {
       const data = {
         title,
@@ -69,41 +69,48 @@ const EventForm = () => {
         state: "Open",
         category_id: Number(categoryId),
         user_id: Number(getAccessToken()),
+      };
+      const response = await apiPost("/events", data);
+      const eventId = response.data.eventId;
+      console.log(imageBase64);
+      if (imageBase64 !== "") {
+        const imageData = {
+          fileName: `image${eventId}`,
+          data: imageBase64,
+        };
+        await apiPut(`/events/${eventId}/image`, imageData);
       }
-      const response = await apiPost("/events", data)
-      const eventId = response.data.eventId
-      const imageData = {
-        fileName: `image${eventId}`,
-        data: imageBase64,
-      }
-      // console.log(imageData)
-      await apiPut(`/events/${eventId}/image`, imageData)
-      navigate("/")
+      navigate("/");
     } catch (error) {
-      console.error("Error during creation of event:", error)
+      console.error("Error during creation of event:", error);
     }
-  }
+  };
 
   const handleImageChange = (e) => {
-    const file = e.target.files[0]
+    const file = e.target.files[0];
     if (file) {
-      const reader = new FileReader()
+      const reader = new FileReader();
       reader.onloadend = () => {
-        setImageBase64(reader.result.split(",")[1]) // Sacamos 'data:image/...;base64,'
-      }
-      reader.readAsDataURL(file)
+        setImageBase64(reader.result.split(",")[1]); // Sacamos 'data:image/...;base64,'
+      };
+      reader.readAsDataURL(file);
     }
-  }
+  };
 
   return (
     <>
       <Header />
       <div className="flex items-center justify-center min-h-screen bg-gradient-to-b from-blue-darker to-secondary">
         <div className="w-full max-w-md p-8 bg-blue-darker rounded shadow">
-          <h2 className="text-2xl font-bold text-center mb-6">Crear nuevo evento</h2>
+          <h2 className="text-2xl font-bold text-center mb-6">
+            Crear nuevo evento
+          </h2>
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
-              <label htmlFor="title" className="block text-sm font-medium text-gray-700">
+              <label
+                htmlFor="title"
+                className="block text-sm font-medium text-gray-700"
+              >
                 Título
               </label>
               <input
@@ -115,7 +122,10 @@ const EventForm = () => {
               />
             </div>
             <div>
-              <label htmlFor="description" className="block text-sm font-medium text-white">
+              <label
+                htmlFor="description"
+                className="block text-sm font-medium text-white"
+              >
                 Descripción
               </label>
               <textarea
@@ -128,7 +138,10 @@ const EventForm = () => {
               ></textarea>
             </div>
             <div>
-              <label htmlFor="location" className="block text-sm font-medium text-gray-700">
+              <label
+                htmlFor="location"
+                className="block text-sm font-medium text-gray-700"
+              >
                 Ubicación
               </label>
               <input
@@ -141,7 +154,10 @@ const EventForm = () => {
             </div>
             <div className="flex justify-between">
               <div>
-                <label htmlFor="beginDate" className="block text-sm font-medium text-white">
+                <label
+                  htmlFor="beginDate"
+                  className="block text-sm font-medium text-white"
+                >
                   Fecha Inicio del Evento
                 </label>
                 <input
@@ -153,7 +169,10 @@ const EventForm = () => {
                 />
               </div>
               <div>
-                <label htmlFor="endDate" className="block text-sm font-medium text-white">
+                <label
+                  htmlFor="endDate"
+                  className="block text-sm font-medium text-white"
+                >
                   Fecha Fin del Evento
                 </label>
                 <input
@@ -166,7 +185,9 @@ const EventForm = () => {
               </div>
             </div>
             <div>
-              <label className="block text-sm font-medium text-white">Modalidad</label>
+              <label className="block text-sm font-medium text-white">
+                Modalidad
+              </label>
               <div className="flex justify-evenly">
                 <div className="mt-2">
                   <label className="inline-flex items-center">
@@ -207,7 +228,10 @@ const EventForm = () => {
             </div>
             {(modality === "Virtual") | (modality === "Hybrid") ? (
               <div>
-                <label htmlFor="virtualRoomLink" className="block text-sm font-medium text-white">
+                <label
+                  htmlFor="virtualRoomLink"
+                  className="block text-sm font-medium text-white"
+                >
                   Enlace de la sala virtual
                 </label>
                 <input
@@ -222,7 +246,9 @@ const EventForm = () => {
               <></>
             )}
             <div>
-              <label className="block text-sm font-medium text-gray-700">Categoría</label>
+              <label className="block text-sm font-medium text-gray-700">
+                Categoría
+              </label>
               <div className="flex flex-wrap gap-2 mt-2">
                 {loading ? (
                   <Loader />
@@ -247,7 +273,10 @@ const EventForm = () => {
               </div>
             </div>
             <div>
-              <label htmlFor="image" className="block text-sm font-medium text-white">
+              <label
+                htmlFor="image"
+                className="block text-sm font-medium text-white"
+              >
                 Imagen
               </label>
               <input
@@ -268,7 +297,7 @@ const EventForm = () => {
         </div>
       </div>
     </>
-  )
-}
+  );
+};
 
-export default EventForm
+export default EventForm;
