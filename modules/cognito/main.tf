@@ -76,8 +76,8 @@ resource "aws_cognito_user_pool_client" "userpool_client" {
     allowed_oauth_flows_user_pool_client = true
     allowed_oauth_flows = ["implicit"]
     allowed_oauth_scopes = [ "email", "openid", "aws.cognito.signin.user.admin" ]
-    explicit_auth_flows = [ "ALLOW_CUSTOM_AUTH", "ALLOW_USER_SRP_AUTH", "ALLOW_REFRESH_TOKEN_AUTH" ]
-    generate_secret = true
+    explicit_auth_flows = [ "ALLOW_CUSTOM_AUTH", "ALLOW_USER_SRP_AUTH", "ALLOW_REFRESH_TOKEN_AUTH", "USER_PASSWORD_AUTH" ]
+    generate_secret = false
     # logout_urls = [  ]
     supported_identity_providers = [ "Google", "COGNITO" ]
 }
