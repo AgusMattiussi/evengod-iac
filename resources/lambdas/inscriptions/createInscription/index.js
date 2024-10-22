@@ -10,7 +10,7 @@ const dbConfig = {
 };
 
 const INSERT_INSCRIPTION_QUERY =
-  "INSERT INTO inscriptions (user_id, event_id, state) VALUES (?, ?, ?)";
+  "INSERT INTO inscriptions (user_uuid, event_id, state) VALUES (?, ?, ?)";
 
 // POST /inscriptions endpoint
 exports.handler = async (event, context) => {
