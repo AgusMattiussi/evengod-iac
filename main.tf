@@ -98,7 +98,6 @@ module "cognito" {
   user_pool_name  = var.user_pool_name
   google_client_id = var.google_client_id
   google_client_secret = var.google_client_secret
-
 }
 
 
@@ -159,6 +158,7 @@ module "api_gateway" {
   api_name = var.api_name
   api_description = var.api_description
   stage_name = var.stage_name
+  cognito_user_pool_arn = module.cognito.arn
 }
 
 # =============== Frontend Build =====================
