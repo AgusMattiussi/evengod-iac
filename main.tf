@@ -157,17 +157,36 @@ resource "null_resource" "invoke_db" {
 
 # =============== REST API ===========================
 
-module "api_gateway" {
-  depends_on = [ module.lambda_functions ]
-  source = "./modules/api-gateway"
-  api_name = var.api_name
-  api_description = var.api_description
-  stage_name = var.stage_name
-  cognito_user_pool_arn = module.cognito.arn
-
+locals {
   lambda_function_arns = {
     for name, lambda in module.lambda_functions : name => lambda.function_arn
   }
+}
+
+module "api_gateway" {
+  depends_on = [module.lambda_functions, module.cognito]
+  source     = "./modules/api-gateway"
+
+  api_name        = var.api_name
+  api_description = var.api_description
+  stage_name      = var.stage_name
+
+  # Pass the Cognito User Pool ARN for authentication
+  cognito_user_pool_arn = module.cognito.arn
+
+  # Pass all Lambda function ARNs
+  lambda_function_arns = local.lambda_function_arns
+}
+
+resource "aws_lambda_permission" "api_gateway_lambda" {
+  for_each = module.lambda_functions
+
+  statement_id  = "AllowAPIGatewayInvoke"
+  action        = "lambda:InvokeFunction"
+  function_name = each.value.function_name
+  principal     = "apigateway.amazonaws.com"
+
+  source_arn = "${module.api_gateway.execution_arn}/*/*"
 }
 
 # =============== Frontend Build =====================
