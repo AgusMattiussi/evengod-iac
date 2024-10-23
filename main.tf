@@ -233,6 +233,6 @@ resource "aws_s3_object" "file" {
     source = "${local.build_directory}/${each.value}"
     etag   = filemd5("${local.build_directory}/${each.value}")
 
-    content_type = lookup(local.mime_types, concat(regexall("([^\\.]*)$", "${each.value}"), [[""]])[0][0], "")
+    content_type = lookup(local.mime_types, concat(regexall("([^\\.]*)$", each.value), [[""]])[0][0], "")
 }
 
