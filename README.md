@@ -6,7 +6,7 @@ Para el correcto deploy de la arquitectura de la aplicación solo se deberá eje
 
 ## Diagrama de arquitectura implementada
 
-<img src="aquitectura.jpg" alt="Arquitectura Implementada" width="800"/>
+![Esquema de la arquitectura](readme-images/Arquitectura%20Cloud.png)
 
 ## Módulos, funciones y meta-argumentos utlizados
 
@@ -60,6 +60,30 @@ Para el correcto deploy de la arquitectura de la aplicación solo se deberá eje
 - [**count**](https://github.com/AgusMattiussi/evengod-iac/blob/main/modules/vpc/main.tf): define cuantas subnets y route tables serán creadas a partir de una lista de CIDR blocks.
 
 - [**lifecycle**](https://github.com/AgusMattiussi/evengod-iac/blob/main/modules/api-gateway/main.tf): controla el comportamiento de creación, actualización o destrucción de un recurso.
+
+## Endpoints de la API
+
+| Método | Endpoint                 | Descripción                                 | Lambda conectada        |
+|--------|--------------------------|---------------------------------------------|-------------------------|
+| POST   | `/users`                 | Crea un usuario                             | createUser              |
+| GET    | `/users/{id}`            | Obtiene los detalles de un usuario por ID   | getUserById             |
+| PUT    | `/users/{id}`            | Actualiza los detalles de un usuario        | editUser                |
+| DELETE | `/users/{id}`            | Elimina un usuario                          | deleteUser              |
+| GET    | `/users/{id}/events`     | Obtiene eventos inscritos por usuario       | getEventsByUserId       |
+| GET    | `/users/{id}/image`      | Obtiene la imagen de un usuario             | getuserImg              |
+| PUT    | `/users/{id}/image`      | Actualiza la imagen de un usuario           | putUserImg              |
+| GET    | `/events`                | Obtiene una lista de eventos                | getEvents               |
+| POST   | `/events`                | Crea un nuevo evento                        | createEvent             |
+| GET    | `/events/{id}`           | Obtiene los detalles de un evento por ID    | getEventById            |
+| PUT    | `/events/{id}`           | Actualiza los detalles de un evento         | editEvent               |
+| GET    | `/events/{id}/image`     | Obtiene la imagen de un evento              | getEventImg             |
+| PUT    | `/events/{id}/image`     | Actualiza la imagen de un evento            | putEventImg             |
+| GET    | `/inscriptions`          | Obtiene una lista de inscripciones          | getInscriptions         |
+| POST   | `/inscriptions`          | Crea una nueva inscripción                  | createInscription       |
+| GET    | `/inscriptions/{id}`     | Obtiene el detalle de una inscripción       | getInscriptionById      |
+| PUT    | `/inscriptions/{id}`     | Edita el estado de una inscripción          | editInscription         |
+| GET    | `/categories`            | Obtiene una lista de categorías             | getCategories           |
+| GET    | `/categories/{id}`       | Obtiene los detalles de una categoría por ID| getCategoryById         |
 
 ## Rúbrica
 
