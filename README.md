@@ -59,7 +59,7 @@ Para el correcto deploy de la arquitectura de la aplicación solo se deberá eje
 
 - [**count**](https://github.com/AgusMattiussi/evengod-iac/blob/main/modules/vpc/main.tf): define cuantas subnets y route tables serán creadas a partir de una lista de CIDR blocks.
 
-- [**lifecycle**](https://github.com/AgusMattiussi/evengod-iac/blob/main/modules/api-gateway/main.tf):
+- [**lifecycle**](https://github.com/AgusMattiussi/evengod-iac/blob/main/modules/api-gateway/main.tf): controla el comportamiento de creación, actualización o destrucción de un recurso.
 
 ## Rúbrica
 
