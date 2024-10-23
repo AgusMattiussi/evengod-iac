@@ -215,7 +215,7 @@ resource "null_resource" "frontend_build" {
   depends_on = [ null_resource.api-gateway-url, module.s3_frontend, null_resource.client_id ]
 
   provisioner "local-exec" {
-    command = "rm -r build && npm install && npm run build"
+    command = "npm install && npm run build"
     working_dir = local.frontend_directory
   }
   triggers = {
