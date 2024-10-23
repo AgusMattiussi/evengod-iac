@@ -2,11 +2,13 @@
 
 ## Instrucciones de deploy
 
-Para el correcto deploy de la arquitectura de la aplicación solo se deberá ejecutar el comando `terraform apply` en la carpeta raíz del directorio.
+Para el correcto deploy de la arquitectura de la aplicación se deberá ejecutar el comando `terraform init` seguido de `terraform apply` ambos en la carpeta raíz del directorio.
+
+_Disclamer_: Notamos que en varios casos hace falta ejecutar **2 veces** el comando `terraform apply` (sin hacer modificaciones) para que la arquitectura termine de levantarse.
 
 ## Diagrama de arquitectura implementada
 
-![Esquema de la arquitectura](readme-images/Arquitectura%20Cloud.png)
+![Esquema de la arquitectura](resources/Arquitectura%20Cloud.png)
 
 ## Módulos, funciones y meta-argumentos utlizados
 
@@ -41,6 +43,8 @@ Para el correcto deploy de la arquitectura de la aplicación solo se deberá eje
 
 ### Funciones
 
+Algunas de las funciones utilizadas son:
+
 - [**jsonencode**](https://github.com/AgusMattiussi/evengod-iac/blob/main/modules/rds/main.tf): usada para convertir las variables _username_ y _password_ en un json para generar el secret del RDS proxy.
 
 - [**length**](https://github.com/AgusMattiussi/evengod-iac/blob/main/modules/vpc/main.tf): usada junto con count para generar N cantidad de subnets y route tables.
@@ -63,27 +67,27 @@ Para el correcto deploy de la arquitectura de la aplicación solo se deberá eje
 
 ## Endpoints de la API
 
-| Método | Endpoint                 | Descripción                                 | Lambda conectada        |
-|--------|--------------------------|---------------------------------------------|-------------------------|
-| POST   | `/users`                 | Crea un usuario                             | createUser              |
-| GET    | `/users/{id}`            | Obtiene los detalles de un usuario por ID   | getUserById             |
-| PUT    | `/users/{id}`            | Actualiza los detalles de un usuario        | editUser                |
-| DELETE | `/users/{id}`            | Elimina un usuario                          | deleteUser              |
-| GET    | `/users/{id}/events`     | Obtiene eventos inscritos por usuario       | getEventsByUserId       |
-| GET    | `/users/{id}/image`      | Obtiene la imagen de un usuario             | getuserImg              |
-| PUT    | `/users/{id}/image`      | Actualiza la imagen de un usuario           | putUserImg              |
-| GET    | `/events`                | Obtiene una lista de eventos                | getEvents               |
-| POST   | `/events`                | Crea un nuevo evento                        | createEvent             |
-| GET    | `/events/{id}`           | Obtiene los detalles de un evento por ID    | getEventById            |
-| PUT    | `/events/{id}`           | Actualiza los detalles de un evento         | editEvent               |
-| GET    | `/events/{id}/image`     | Obtiene la imagen de un evento              | getEventImg             |
-| PUT    | `/events/{id}/image`     | Actualiza la imagen de un evento            | putEventImg             |
-| GET    | `/inscriptions`          | Obtiene una lista de inscripciones          | getInscriptions         |
-| POST   | `/inscriptions`          | Crea una nueva inscripción                  | createInscription       |
-| GET    | `/inscriptions/{id}`     | Obtiene el detalle de una inscripción       | getInscriptionById      |
-| PUT    | `/inscriptions/{id}`     | Edita el estado de una inscripción          | editInscription         |
-| GET    | `/categories`            | Obtiene una lista de categorías             | getCategories           |
-| GET    | `/categories/{id}`       | Obtiene los detalles de una categoría por ID| getCategoryById         |
+| Método | Endpoint             | Descripción                                  | Lambda conectada   |
+| ------ | -------------------- | -------------------------------------------- | ------------------ |
+| POST   | `/users`             | Crea un usuario                              | createUser         |
+| GET    | `/users/{id}`        | Obtiene los detalles de un usuario por ID    | getUserById        |
+| PUT    | `/users/{id}`        | Actualiza los detalles de un usuario         | editUser           |
+| DELETE | `/users/{id}`        | Elimina un usuario                           | deleteUser         |
+| GET    | `/users/{id}/events` | Obtiene eventos inscritos por usuario        | getEventsByUserId  |
+| GET    | `/users/{id}/image`  | Obtiene la imagen de un usuario              | getuserImg         |
+| PUT    | `/users/{id}/image`  | Actualiza la imagen de un usuario            | putUserImg         |
+| GET    | `/events`            | Obtiene una lista de eventos                 | getEvents          |
+| POST   | `/events`            | Crea un nuevo evento                         | createEvent        |
+| GET    | `/events/{id}`       | Obtiene los detalles de un evento por ID     | getEventById       |
+| PUT    | `/events/{id}`       | Actualiza los detalles de un evento          | editEvent          |
+| GET    | `/events/{id}/image` | Obtiene la imagen de un evento               | getEventImg        |
+| PUT    | `/events/{id}/image` | Actualiza la imagen de un evento             | putEventImg        |
+| GET    | `/inscriptions`      | Obtiene una lista de inscripciones           | getInscriptions    |
+| POST   | `/inscriptions`      | Crea una nueva inscripción                   | createInscription  |
+| GET    | `/inscriptions/{id}` | Obtiene el detalle de una inscripción        | getInscriptionById |
+| PUT    | `/inscriptions/{id}` | Edita el estado de una inscripción           | editInscription    |
+| GET    | `/categories`        | Obtiene una lista de categorías              | getCategories      |
+| GET    | `/categories/{id}`   | Obtiene los detalles de una categoría por ID | getCategoryById    |
 
 ## Rúbrica
 
@@ -105,7 +109,7 @@ Para el correcto deploy de la arquitectura de la aplicación solo se deberá eje
     </tr>
     <tr>
         <td>Julián Sasso</td>
-        <td>61636</td>
+        <td>61535</td>
         <td>25%</td>
     </tr>
     <tr>
