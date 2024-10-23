@@ -127,8 +127,8 @@ module "lambda_functions" {
   source_dir             = "${local.lambdas_dir}/${each.value.source_dir}"
   role                   = data.aws_iam_role.lab_role.arn
   layer_arn              = aws_lambda_layer_version.common_dependencies.arn
-  vpc_subnet_ids         = data.aws_subnets.lambdas_subnets.ids
-  vpc_security_group_ids = [module.security_groups.lambda_sg_id]
+  vpc_subnet_ids         = contains(["createUser", "getUserById"], each.value.name) ? [] : data.aws_subnets.lambdas_subnets.ids
+  vpc_security_group_ids = contains(["createUser", "getUserById"], each.value.name) ? [] : [module.security_groups.lambda_sg_id]
 
   environment_variables = {
     RDS_HOST       = module.rds_mysql.proxy_endpoint
