@@ -4,11 +4,13 @@ import { useNavigate } from "react-router-dom";
 import { useSharedAuth } from "../services/auth";
 import { HttpStatusCode } from "axios";
 import { login } from "../services/cognito";
+import { Loader } from "../components/loader";
 
 const Login = () => {
   const navigate = useNavigate();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [loading, setLoading] = useState(false);
 
   const { userInfo, setAccessToken } = useSharedAuth();
 
@@ -18,6 +20,7 @@ const Login = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setLoading(true);
     try {
       const response = await login(email, password);
       if (response === HttpStatusCode.InternalServerError) {
@@ -31,6 +34,8 @@ const Login = () => {
       }
     } catch (error) {
       console.error("Error fetching user:", error);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -73,12 +78,18 @@ const Login = () => {
                 required
               />
             </div>
-            <button
-              type="submit"
-              className="w-full py-2 bg-blue-light text-white rounded-md hover:bg-blue transition-colors"
-            >
-              Ingresar
-            </button>
+            {loading ? (
+              <div className="flex items-center justify-center">
+                <Loader />
+              </div>
+            ) : (
+              <button
+                type="submit"
+                className="w-full py-2 bg-blue-light text-white rounded-md hover:bg-blue transition-colors"
+              >
+                Ingresar
+              </button>
+            )}
           </form>
           <div className="mt-4 text-center">
             <button

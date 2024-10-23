@@ -2,15 +2,19 @@ import React, { useState } from "react";
 import Header from "../components/header";
 import { useNavigate } from "react-router-dom";
 import { apiPost } from "../services/api";
+import { Loader } from "../components/loader";
 
 const SignUp = () => {
   const navigate = useNavigate();
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [loading, setLoading] = useState(false);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    setLoading(true);
 
     try {
       const data = {
@@ -25,6 +29,8 @@ const SignUp = () => {
       navigate("/login");
     } catch (error) {
       console.error("Error during registration:", error);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -85,29 +91,18 @@ const SignUp = () => {
                 required
               />
             </div>
-            {/* <div>
-              <label className="block text-sm font-medium text-gray-700">Tópicos de Interés</label>
-              <div className="flex flex-wrap gap-2 mt-2">
-                {topics.map((topic) => (
-                  <button
-                    key={topic}
-                    type="button"
-                    onClick={() => handleTopicClick(topic)}
-                    className={`px-3 py-1 border rounded-full ${
-                      selectedTopics.includes(topic) ? "bg-blue-light text-white" : "bg-gray-200 text-gray-700"
-                    } hover:bg-indigo-700 hover:text-white transition-colors`}
-                  >
-                    {topic}
-                  </button>
-                ))}
+            {loading ? (
+              <div className="flex items-center justify-center">
+                <Loader />
               </div>
-            </div> */}
-            <button
-              type="submit"
-              className="w-full py-2 bg-blue-light text-white rounded-md hover:bg-blue transition-colors"
-            >
-              Registrarse
-            </button>
+            ) : (
+              <button
+                type="submit"
+                className="w-full py-2 bg-blue-light text-white rounded-md hover:bg-blue transition-colors"
+              >
+                Registrarse
+              </button>
+            )}
           </form>
           <div className="mt-4 text-center">
             <button
