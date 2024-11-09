@@ -5,7 +5,7 @@ import {
 import { jwtDecode } from "jwt-decode";
 import { HttpStatusCode } from "axios";
 
-const CLIENT_ID = "5mhhrdfjnplhmskhnfhnp4mstr";
+const CLIENT_ID = "crm91fqir5vs43uonbqm6vskd";
 
 const cognitoClient = new CognitoIdentityProviderClient({
   region: "us-east-1",

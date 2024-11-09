@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import Header from "../components/header";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { apiPost, apiGet, apiPut } from "../services/api";
 import { Loader } from "../components/loader";
 import { HttpStatusCode } from "axios";
@@ -8,13 +8,39 @@ import { useSharedAuth } from "../services/auth";
 
 const EditUserForm = () => {
   const navigate = useNavigate();
-  const { getAccessToken } = useSharedAuth();
+  const [user, setUser] = useState({});
+  const { getAccessToken, getSub } = useSharedAuth();
 
   const [userName, setUserName] = useState("");
   const [description, setDescription] = useState("");
   const [homeplace, setHomeplace] = useState("");
   const [imageBase64, setImageBase64] = useState("");
   const [loading, setLoading] = useState(true);
+
+  const fetchUser = useCallback(async () => {
+    setLoading(true);
+
+    try {
+      const response = await apiGet(`/users/${getSub()}`);
+      if (response.status === HttpStatusCode.InternalServerError) {
+        navigate("/500");
+      } else if (response.status === HttpStatusCode.NoContent) {
+        setUser({});
+      } else {
+        setUser(response.data);
+      }
+    } catch (error) {
+      console.error("Error fetching user:", error);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    if (loading) {
+      fetchUser();
+    }
+  }, []);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -50,6 +76,7 @@ const EditUserForm = () => {
                 onChange={(e) => setUserName(e.target.value)}
                 style={{ color: "black" }}
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                placeholder={user.name}
                 required
               />
             </div>
@@ -66,6 +93,7 @@ const EditUserForm = () => {
                 onChange={(e) => setDescription(e.target.value)}
                 style={{ color: "black" }}
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-light"
+                placeholder={user.description}
                 required
               ></textarea>
             </div>
@@ -81,6 +109,7 @@ const EditUserForm = () => {
                 onChange={(e) => setHomeplace(e.target.value)}
                 style={{ color: "black" }}
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                placeholder={user.homeplace}
                 required
               />
             </div>
