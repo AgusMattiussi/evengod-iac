@@ -1,5 +1,7 @@
 const AWS = require("aws-sdk");
 const mysql = require("mysql2/promise");
+const jwt = require("jsonwebtoken");
+
 
 const dbConfig = {
   host: process.env.RDS_HOST,
@@ -56,15 +58,44 @@ exports.handler = async (event, context) => {
 
   try {
     const eventId = event.params && event.params.path && event.params.path.id;
-    // TODO: Cambiar esto para la api gw de cognito
-    const userUuid = event.requestContext.authorizer.claims.sub; //User UUID
-
+    
     if (!eventId) {
       return {
         statusCode: 400,
         body: JSON.stringify({ message: "eventId is required in the path" }),
       };
     }
+
+    const authorizationHeader =
+      event.headers.Authorization || event.headers.authorization;
+
+    if (!authorizationHeader) {
+      return {
+        statusCode: 401,
+        body: JSON.stringify({ message: "Authorization header missing" }),
+      };
+    }
+
+    const token = authorizationHeader.split(" ")[1];
+    if (!token) {
+      return {
+        statusCode: 401,
+        body: JSON.stringify({ message: "Invalid Authorization format" }),
+      };
+    }
+
+    const decodedToken = jwt.decode(token);
+
+    if (!decodedToken || !decodedToken.sub) {
+      return {
+        statusCode: 400,
+        body: JSON.stringify({ message: "Invalid token" }),
+      };
+    }
+
+    // ID of the user making the request
+    const userUuid = decodedToken.sub;
+
 
     connection = await mysql.createConnection(dbConfig);
 
@@ -94,8 +125,7 @@ exports.handler = async (event, context) => {
       };
     }
 
-    const to_update = JSON.parse(event.body);
-    const editEvent = new EditEvent(to_update);
+    const editEvent = new EditEvent(JSON.parse(event.body));
 
     const { query, params } = editEvent.buildUpdateQuery(eventId);
 
