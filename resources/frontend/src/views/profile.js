@@ -4,10 +4,13 @@ import { useNavigate, useParams } from "react-router-dom";
 import { HttpStatusCode } from "axios";
 import Navbar from "../components/navbar";
 import { Loader } from "../components/loader";
+import { Pencil } from "lucide-react";
 import defaultProfileImage from "../images/defaultProfile.jpg";
+import { useSharedAuth } from "../services/auth";
 
 const Profile = () => {
   const navigate = useNavigate();
+  const { getSub } = useSharedAuth();
 
   const [user, setUser] = useState({});
   const { id } = useParams();
@@ -38,6 +41,12 @@ const Profile = () => {
     }
   }, []);
 
+  const handleEditProfile = () => {
+    navigate(`/profile/${id}/edit`);
+  };
+
+  const isProfileOwner = id === getSub();
+
   return (
     <>
       <Navbar />
@@ -56,16 +65,23 @@ const Profile = () => {
                   />
                 </div>
                 <div className="lg:col-span-2">
-                  <h1 className="text-5xl font-bold mb-4">{user.name}</h1>
-                  <p className="mb-6text-gray-400">{user.description}</p>
-                  {/*<p className="mb-3 text-xl text-gray-400">Tópicos de interes:</p>
-                 <div className="flex flex-wrap gap-2">
-                  {topics.map((topic) => (
-                    <div key={topic} className="px-3 py-1 rounded-full bg-secondary text-white">
-                      {topic}
-                    </div>
-                  ))}
-                </div> */}
+                  <div className="flex">
+                    <h1 className="text-5xl font-bold mb-4 mr-2">
+                      {user.name}
+                    </h1>
+                    {isProfileOwner ? (
+                      <button
+                        className="text-gray-500 hover:text-blue-light ml-5 mb-3"
+                        aria-label="Edit profile"
+                        onClick={handleEditProfile}
+                      >
+                        <Pencil className="h-6 w-6" />
+                      </button>
+                    ) : (
+                      <> </>
+                    )}
+                  </div>
+                  <p className="mb-6 text-gray-400">{user.description}</p>
                 </div>
               </main>
             </div>
