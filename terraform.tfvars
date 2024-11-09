@@ -52,6 +52,12 @@ lambda_functions = [
     source_dir = "events/createEvent"
   },
   {
+    name       = "deleteEvent"
+    handler    = "index.handler"
+    runtime    = "nodejs20.x"
+    source_dir = "events/deleteEvent"
+  },
+  {
     name       = "editEvent"
     handler    = "index.handler"
     runtime    = "nodejs20.x"

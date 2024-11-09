@@ -243,6 +243,29 @@ resource "aws_api_gateway_integration" "update_event" {
   uri                     = "${local.lambda_uri_prefix}/${var.lambda_functions["editEvent"]}/invocations"
 }
 
+# DELETE EVENT
+resource "aws_api_gateway_method" "delete_event" {
+  rest_api_id   = var.rest_api_id
+  resource_id   = var.resources["event_id"]
+  http_method   = "DELETE"
+  authorization = "COGNITO_USER_POOLS"
+  authorizer_id = var.authorizer_id
+
+  request_parameters = {
+    "method.request.path.id" = true
+  }
+}
+
+resource "aws_api_gateway_integration" "delete_event" {
+  rest_api_id = var.rest_api_id
+  resource_id = var.resources["event_id"]
+  http_method = aws_api_gateway_method.delete_event.http_method
+
+  integration_http_method = "POST"
+  type                    = "AWS_PROXY"
+  uri                     = "${local.lambda_uri_prefix}/${var.lambda_functions["deleteEvent"]}/invocations"
+}
+
 # GET EVENT IMAGE BY ID
 resource "aws_api_gateway_method" "get_event_image" {
   rest_api_id   = var.rest_api_id
