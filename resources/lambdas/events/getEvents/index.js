@@ -43,6 +43,11 @@ const buildEventQuery = (queryParams) => {
     params.push(`%${queryParams.category_id}%`);
   }
 
+  if (queryParams.user_uuid) {
+    query += " AND user_uuid LIKE ?";
+    params.push(`%${queryParams.user_uuid}%`);
+  }
+
   return { query, params };
 };
 
