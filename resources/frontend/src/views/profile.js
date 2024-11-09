@@ -6,9 +6,11 @@ import Navbar from "../components/navbar";
 import { Loader } from "../components/loader";
 import { Pencil } from "lucide-react";
 import defaultProfileImage from "../images/defaultProfile.jpg";
+import { useSharedAuth } from "../services/auth";
 
 const Profile = () => {
   const navigate = useNavigate();
+  const { getSub } = useSharedAuth();
 
   const [user, setUser] = useState({});
   const { id } = useParams();
@@ -43,6 +45,8 @@ const Profile = () => {
     navigate(`/profile/${id}/edit`);
   };
 
+  const isProfileOwner = id === getSub();
+
   return (
     <>
       <Navbar />
@@ -65,15 +69,18 @@ const Profile = () => {
                     <h1 className="text-5xl font-bold mb-4 mr-2">
                       {user.name}
                     </h1>
-                    <button
-                      className="text-gray-500 hover:text-blue-light ml-5 mb-3"
-                      aria-label="Edit profile"
-                      onClick={handleEditProfile}
-                    >
-                      <Pencil className="h-6 w-6" />
-                    </button>
+                    {isProfileOwner ? (
+                      <button
+                        className="text-gray-500 hover:text-blue-light ml-5 mb-3"
+                        aria-label="Edit profile"
+                        onClick={handleEditProfile}
+                      >
+                        <Pencil className="h-6 w-6" />
+                      </button>
+                    ) : (
+                      <> </>
+                    )}
                   </div>
-
                   <p className="mb-6 text-gray-400">{user.description}</p>
                 </div>
               </main>

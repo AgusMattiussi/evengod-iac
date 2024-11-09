@@ -9,6 +9,7 @@ import Event from "./views/event";
 import Profile from "./views/profile";
 import MyEvents from "./views/myEvents";
 import NotFound from "./views/notFound";
+import EditUserForm from "./views/editUserForm";
 
 const App = () => {
   return (
@@ -22,6 +23,7 @@ const App = () => {
           <Route path="/create-event" element={<EventForm />} />
           <Route path="/events/:id" element={<Event />} />
           <Route path="/profile/:id" element={<Profile />} />
+          <Route path="/profile/:id/edit" element={<EditUserForm />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>
