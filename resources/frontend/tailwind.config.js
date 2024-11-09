@@ -12,7 +12,9 @@ module.exports = {
         DEFAULT: "#3b4452",
       },
       white: "#ffffff",
+      red: "#d11a2a",
+      grey: " #969190",
     },
     plugins: [],
   },
-}
+};

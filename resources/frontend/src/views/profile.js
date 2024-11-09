@@ -7,16 +7,18 @@ import { Loader } from "../components/loader";
 import { Pencil } from "lucide-react";
 import defaultProfileImage from "../images/defaultProfile.jpg";
 import { useSharedAuth } from "../services/auth";
+import MyEventCard from "../components/myEventCard";
 
 const Profile = () => {
   const navigate = useNavigate();
   const { getSub } = useSharedAuth();
 
   const [user, setUser] = useState({});
+  const [events, setEvents] = useState([]);
   const { id } = useParams();
   const [loading, setLoading] = useState(true);
 
-  const fetchEvent = useCallback(async () => {
+  const fetchUser = useCallback(async () => {
     setLoading(true);
 
     try {
@@ -35,9 +37,33 @@ const Profile = () => {
     }
   }, []);
 
+  const fetchEvents = useCallback(async (user_id) => {
+    setLoading(true);
+
+    const queryParams = {};
+
+    if (user_id) queryParams.user_uuid = user_id;
+
+    try {
+      const response = await apiGet(`/events`, queryParams);
+      if (response.status === HttpStatusCode.InternalServerError) {
+        navigate("/500");
+      } else if (response.status === HttpStatusCode.NoContent) {
+        setEvents([]);
+      } else {
+        setEvents(response.data);
+      }
+    } catch (error) {
+      console.error("Error fetching events:", error);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
   useEffect(() => {
     if (loading) {
-      fetchEvent();
+      fetchUser();
+      fetchEvents(id);
     }
   }, []);
 
@@ -61,7 +87,7 @@ const Profile = () => {
                   <img
                     src={defaultProfileImage}
                     alt="Conference"
-                    className="size-64 rounded-lg shadow-lg"
+                    className="size-64 rounded-lg shadow-lg mr-8"
                   />
                 </div>
                 <div className="lg:col-span-2">
@@ -82,6 +108,29 @@ const Profile = () => {
                     )}
                   </div>
                   <p className="mb-6 text-gray-400">{user.description}</p>
+                  <h2 className="text-2xl font-bold mt-10 mb-4">
+                    Eventos creados
+                  </h2>
+                  {loading ? (
+                    <Loader />
+                  ) : events.length === 0 ? (
+                    <p className="text-gray-500 text-center mt-4">
+                      No hay eventos creados
+                    </p>
+                  ) : (
+                    events
+                      .sort(
+                        (a, b) =>
+                          new Date(a.start_date) - new Date(b.start_date)
+                      )
+                      .map((event) => (
+                        <MyEventCard
+                          key={event.id}
+                          event={event}
+                          editable={isProfileOwner}
+                        />
+                      ))
+                  )}
                 </div>
               </main>
             </div>

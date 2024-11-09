@@ -1,42 +1,42 @@
-import React, { useState, useEffect, useCallback } from "react"
-import { apiGet } from "../services/api"
-import { useNavigate } from "react-router-dom"
-import { HttpStatusCode } from "axios"
-import { Loader } from "../components/loader"
-import Navbar from "../components/navbar"
-import MyEventCard from "../components/myEventCard"
-import { useSharedAuth } from "../services/auth"
+import React, { useState, useEffect, useCallback } from "react";
+import { apiGet } from "../services/api";
+import { useNavigate } from "react-router-dom";
+import { HttpStatusCode } from "axios";
+import { Loader } from "../components/loader";
+import Navbar from "../components/navbar";
+import MyEventCard from "../components/myEventCard";
+import { useSharedAuth } from "../services/auth";
 
 const MyEvents = () => {
-  const navigate = useNavigate()
-  const { getAccessToken } = useSharedAuth()
-  const [events, setEvents] = useState([])
-  const [loading, setLoading] = useState(true)
+  const navigate = useNavigate();
+  const { getAccessToken } = useSharedAuth();
+  const [events, setEvents] = useState([]);
+  const [loading, setLoading] = useState(true);
 
   const fetchInscriptions = useCallback(async (user_id) => {
-    setLoading(true)
+    setLoading(true);
 
     try {
-      const response = await apiGet(`/users/${user_id}/events`)
+      const response = await apiGet(`/users/${user_id}/events`);
       if (response.status === HttpStatusCode.InternalServerError) {
-        navigate("/500")
+        navigate("/500");
       } else if (response.status === HttpStatusCode.NoContent) {
-        setEvents([])
+        setEvents([]);
       } else {
-        setEvents(response.data)
+        setEvents(response.data);
       }
     } catch (error) {
-      console.error("Error fetching inscriptions:", error)
+      console.error("Error fetching inscriptions:", error);
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }, [])
+  }, []);
 
   useEffect(() => {
     if (loading) {
-      fetchInscriptions(getAccessToken())
+      fetchInscriptions(getAccessToken());
     }
-  }, [loading])
+  }, [loading]);
 
   return (
     <main>
@@ -50,13 +50,15 @@ const MyEvents = () => {
             ) : (
               events
                 .sort((a, b) => new Date(a.start_date) - new Date(b.start_date))
-                .map((event) => <MyEventCard key={event.id} event={event} />)
+                .map((event) => (
+                  <MyEventCard key={event.id} event={event} editable={false} />
+                ))
             )}
           </div>
         </div>
       </div>
     </main>
-  )
-}
+  );
+};
 
-export default MyEvents
+export default MyEvents;
