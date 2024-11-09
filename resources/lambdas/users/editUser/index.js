@@ -11,8 +11,36 @@ exports.handler = async (event, context) => {
     }
 
     // Check UUID of the user making the request
-    // TODO: Change this for the cognito api gw
-    const userUuid = event.requestContext.authorizer.claims.sub;
+    const authorizationHeader =
+    event.headers.Authorization || event.headers.authorization;
+
+    if (!authorizationHeader) {
+      return {
+        statusCode: 401,
+        body: JSON.stringify({ message: "Authorization header missing" }),
+      };
+    }
+
+    const token = authorizationHeader.split(" ")[1];
+    if (!token) {
+      return {
+        statusCode: 401,
+        body: JSON.stringify({ message: "Invalid Authorization format" }),
+      };
+    }
+
+    const decodedToken = jwt.decode(token);
+
+    if (!decodedToken || !decodedToken.sub) {
+      return {
+        statusCode: 400,
+        body: JSON.stringify({ message: "Invalid token" }),
+      };
+    }
+
+    // ID of the user making the request
+    const userUuid = decodedToken.sub;
+    
     const pathUserId =
       event.params && event.params.path && event.params.path.id;
 
