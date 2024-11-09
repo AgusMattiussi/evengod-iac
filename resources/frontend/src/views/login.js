@@ -5,6 +5,7 @@ import { useSharedAuth } from "../services/auth";
 import { HttpStatusCode } from "axios";
 import { login } from "../services/cognito";
 import { Loader } from "../components/loader";
+import GoogleSignIn from "../services/google_login.js";
 
 const Login = () => {
   const navigate = useNavigate();
@@ -91,6 +92,8 @@ const Login = () => {
               </button>
             )}
           </form>
+          <br />
+          <GoogleSignIn />
           <div className="mt-4 text-center">
             <button
               onClick={handleSignUpRedirect}
