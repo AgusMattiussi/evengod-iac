@@ -10,6 +10,7 @@ import Profile from "./views/profile";
 import MyEvents from "./views/myEvents";
 import NotFound from "./views/notFound";
 import EditUserForm from "./views/editUserForm";
+import EditEventForm from "./views/editEventForm";
 
 const App = () => {
   return (
@@ -21,6 +22,7 @@ const App = () => {
           <Route path="/" element={<Home />} />
           <Route path="/my-events" element={<MyEvents />} />
           <Route path="/create-event" element={<EventForm />} />
+          <Route path="/edit-event/:id" element={<EditEventForm />} />
           <Route path="/events/:id" element={<Event />} />
           <Route path="/profile/:id" element={<Profile />} />
           <Route path="/profile/:id/edit" element={<EditUserForm />} />

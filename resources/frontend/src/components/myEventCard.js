@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from "react";
-import { apiGet } from "../services/api";
+import { apiGet, apiDelete } from "../services/api";
 import { useNavigate } from "react-router-dom";
 import { HttpStatusCode } from "axios";
 import defaultEventImage from "../images/defaultEvent.jpg";
@@ -57,13 +57,19 @@ const MyEventCard = ({ event, editable }) => {
     }
   };
 
-  const handleEditEvent = (event) => {
-    event.stopPropagation();
-    // navigate(`/events/${event.id}/edit`);
+  const handleEditEvent = (e) => {
+    e.stopPropagation();
+    navigate(`/edit-event/${event.id}`);
   };
 
-  const handleDeleteEvent = (event) => {
-    event.stopPropagation();
+  const handleDeleteEvent = (e) => {
+    e.stopPropagation();
+    console.log("Deleting event:", event.id);
+    // try {
+    //   const response = apiDelete(`/events/${event.id}`);
+    // } catch (error) {
+    //   console.error("Error deleting event:", error);
+    // }
   };
 
   return (
@@ -109,14 +115,14 @@ const MyEventCard = ({ event, editable }) => {
                 <button
                   className="bg-blue-light text-white hover:text-blue-darker rounded-full p-3"
                   aria-label="Edit event"
-                  onClick={handleEditEvent} // Define esta función para editar el evento
+                  onClick={handleEditEvent}
                 >
                   <Pencil className="h-7 w-7" />
                 </button>
                 <button
                   className="bg-red text-white hover:text-blue-darker rounded-full p-3 ml-3"
                   aria-label="Delete event"
-                  onClick={handleDeleteEvent} // Define esta función para eliminar el evento
+                  onClick={handleDeleteEvent}
                 >
                   <Trash2 className="h-7 w-7" />
                 </button>
