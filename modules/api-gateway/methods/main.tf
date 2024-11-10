@@ -449,6 +449,7 @@ locals {
     "create_event"       = aws_api_gateway_method.create_event
     "get_event"          = aws_api_gateway_method.get_event
     "update_event"       = aws_api_gateway_method.update_event
+    "delete_event"       = aws_api_gateway_method.delete_event
     "get_event_image"    = aws_api_gateway_method.get_event_image
     "put_event_image"    = aws_api_gateway_method.put_event_image
     "get_categories"     = aws_api_gateway_method.get_categories
@@ -503,6 +504,7 @@ resource "aws_api_gateway_integration_response" "integration_response_200" {
     aws_api_gateway_integration.create_event,
     aws_api_gateway_integration.get_event,
     aws_api_gateway_integration.update_event,
+    aws_api_gateway_integration.delete_event,
     aws_api_gateway_integration.get_event_image,
     aws_api_gateway_integration.put_event_image,
     aws_api_gateway_integration.get_categories,
@@ -571,6 +573,7 @@ resource "aws_api_gateway_integration_response" "error_integration_responses" {
     aws_api_gateway_integration.create_event,
     aws_api_gateway_integration.get_event,
     aws_api_gateway_integration.update_event,
+    aws_api_gateway_integration.delete_event,
     aws_api_gateway_integration.get_event_image,
     aws_api_gateway_integration.put_event_image,
     aws_api_gateway_integration.get_categories,

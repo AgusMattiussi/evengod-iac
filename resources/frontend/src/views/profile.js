@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from "react";
-import { apiGet } from "../services/api";
+import { apiGet, apiDelete } from "../services/api";
 import { useNavigate, useParams } from "react-router-dom";
 import { HttpStatusCode } from "axios";
 import Navbar from "../components/navbar";
@@ -71,6 +71,19 @@ const Profile = () => {
     navigate(`/profile/${id}/edit`);
   };
 
+  const handleEventDelete = async (eventId) => {
+    try {
+      const response = await apiDelete(`/events/${eventId}`);
+      if (response.status === HttpStatusCode.Ok) {
+        setEvents((prevEvents) =>
+          prevEvents.filter((event) => event.id !== eventId)
+        );
+      }
+    } catch (error) {
+      console.error("Error deleting event:", error);
+    }
+  };
+
   const isProfileOwner = id === getSub();
 
   return (
@@ -128,6 +141,7 @@ const Profile = () => {
                           key={event.id}
                           event={event}
                           editable={isProfileOwner}
+                          onDelete={handleEventDelete}
                         />
                       ))
                   )}

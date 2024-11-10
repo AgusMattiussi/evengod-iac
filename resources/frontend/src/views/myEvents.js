@@ -51,7 +51,12 @@ const MyEvents = () => {
               events
                 .sort((a, b) => new Date(a.start_date) - new Date(b.start_date))
                 .map((event) => (
-                  <MyEventCard key={event.id} event={event} editable={false} />
+                  <MyEventCard
+                    key={event.id}
+                    event={event}
+                    editable={false}
+                    onDelete={null}
+                  />
                 ))
             )}
           </div>

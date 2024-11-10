@@ -1,12 +1,13 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { apiGet, apiDelete } from "../services/api";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { HttpStatusCode } from "axios";
 import defaultEventImage from "../images/defaultEvent.jpg";
 import { Pencil, Trash2 } from "lucide-react";
 
-const MyEventCard = ({ event, editable }) => {
+const MyEventCard = ({ event, editable, onDelete }) => {
   const navigate = useNavigate();
+  const location = useLocation();
 
   const [category, setCategory] = useState({});
   const [loading, setLoading] = useState(true);
@@ -62,14 +63,9 @@ const MyEventCard = ({ event, editable }) => {
     navigate(`/edit-event/${event.id}`);
   };
 
-  const handleDeleteEvent = (e) => {
+  const handleDeleteEvent = async (e) => {
     e.stopPropagation();
-    console.log("Deleting event:", event.id);
-    // try {
-    //   const response = apiDelete(`/events/${event.id}`);
-    // } catch (error) {
-    //   console.error("Error deleting event:", error);
-    // }
+    await onDelete(event.id);
   };
 
   return (
