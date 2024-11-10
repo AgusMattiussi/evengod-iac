@@ -330,6 +330,12 @@ const EditEventForm = () => {
             >
               Crear evento
             </button>
+            <button
+              className="w-full py-2 text-white rounded-md transition-colors"
+              onClick={() => navigate(-1)}
+            >
+              Volver
+            </button>
           </form>
         </div>
       </div>
