@@ -125,9 +125,7 @@ const EditEventForm = () => {
       <Header />
       <div className="flex items-center justify-center min-h-screen bg-gradient-to-b from-blue-darker to-secondary">
         <div className="w-full max-w-md p-8 bg-blue-darker rounded shadow">
-          <h2 className="text-2xl font-bold text-center mb-6">
-            Crear nuevo evento
-          </h2>
+          <h2 className="text-2xl font-bold text-center mb-6">Editar evento</h2>
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
               <label
@@ -178,37 +176,35 @@ const EditEventForm = () => {
                 required
               />
             </div>
-            <div className="flex justify-between">
-              <div>
-                <label
-                  htmlFor="beginDate"
-                  className="block text-sm font-medium text-white"
-                >
-                  Fecha Inicio del Evento
-                </label>
-                <input
-                  type="date"
-                  id="startdate"
-                  onChange={(e) => setStartDate(e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-light"
-                  required
-                />
-              </div>
-              <div>
-                <label
-                  htmlFor="endDate"
-                  className="block text-sm font-medium text-white"
-                >
-                  Fecha Fin del Evento
-                </label>
-                <input
-                  type="date"
-                  id="endDate"
-                  onChange={(e) => setEndDate(e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-light"
-                  required
-                />
-              </div>
+            <div>
+              <label
+                htmlFor="beginDate"
+                className="block text-sm font-medium text-white"
+              >
+                Fecha Inicio del Evento
+              </label>
+              <input
+                type="datetime-local"
+                id="startdate"
+                onChange={(e) => setStartDate(e.target.value)}
+                className="w-full px-3 py-2 borderrounded-md focus:outline-none focus:ring-2 focus:ring-blue-light text-blue-darker"
+                required
+              />
+            </div>
+            <div>
+              <label
+                htmlFor="endDate"
+                className="block text-sm font-medium text-white"
+              >
+                Fecha Fin del Evento
+              </label>
+              <input
+                type="datetime-local"
+                id="endDate"
+                onChange={(e) => setEndDate(e.target.value)}
+                className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-light text-blue-darker"
+                required
+              />
             </div>
             <div>
               <label className="block text-sm font-medium text-white">
