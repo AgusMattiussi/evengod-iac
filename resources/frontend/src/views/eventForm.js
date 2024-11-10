@@ -56,6 +56,7 @@ const EventForm = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setLoading(true);
     const isoStartDate = parseToISOString(startDate);
     const isoEndDate = parseToISOString(endDate);
     try {
@@ -84,6 +85,8 @@ const EventForm = () => {
       navigate("/");
     } catch (error) {
       console.error("Error during creation of event:", error);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -286,12 +289,18 @@ const EventForm = () => {
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-light text-white"
               />
             </div>
-            <button
-              type="submit"
-              className="w-full py-2 bg-blue-light text-white rounded-md hover:bg-blue transition-colors"
-            >
-              Crear evento
-            </button>
+            {loading ? (
+              <div className="flex items-center justify-center">
+                <Loader />
+              </div>
+            ) : (
+              <button
+                type="submit"
+                className="w-full py-2 bg-blue-light text-white rounded-md hover:bg-blue transition-colors"
+              >
+                Crear evento
+              </button>
+            )}
           </form>
         </div>
       </div>

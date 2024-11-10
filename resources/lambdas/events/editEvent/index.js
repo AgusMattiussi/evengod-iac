@@ -2,7 +2,6 @@ const AWS = require("aws-sdk");
 const mysql = require("mysql2/promise");
 const jwt = require("jsonwebtoken");
 
-
 const dbConfig = {
   host: process.env.RDS_HOST,
   user: process.env.DB_USERNAME,
@@ -57,8 +56,8 @@ exports.handler = async (event, context) => {
   let connection;
 
   try {
-    const eventId = event.params && event.params.path && event.params.path.id;
-    
+    const eventId = event.pathParameters.id;
+
     if (!eventId) {
       return {
         statusCode: 400,
@@ -95,7 +94,6 @@ exports.handler = async (event, context) => {
 
     // ID of the user making the request
     const userUuid = decodedToken.sub;
-
 
     connection = await mysql.createConnection(dbConfig);
 
