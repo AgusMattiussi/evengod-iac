@@ -117,7 +117,7 @@ const EditEventForm = () => {
       }
       navigate("/");
     } catch (error) {
-      console.error("Error during creation of event:", error);
+      console.error("Error during updating the event:", error);
     } finally {
       setResponseLoading(false);
     }
@@ -340,7 +340,6 @@ const EditEventForm = () => {
                 Modificar evento
               </button>
             )}
-
             <button
               className="w-full py-2 text-white rounded-md transition-colors"
               onClick={() => navigate(-1)}

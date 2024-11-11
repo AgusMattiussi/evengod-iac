@@ -83,7 +83,11 @@ const Navbar = () => {
               onClick={() => navigate(`/profile/${sub}`)}
             >
               <img
-                src={defaultProfile}
+                src={
+                  userInfo.profile_image_url
+                    ? userInfo.profile_image_url
+                    : defaultProfile
+                }
                 alt="User Avatar"
                 className="user-avatar"
               />

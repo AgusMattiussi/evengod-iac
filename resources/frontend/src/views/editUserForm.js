@@ -44,6 +44,30 @@ const EditUserForm = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setLoading(true);
+    try {
+      const data = {
+        name: userName,
+        description: description,
+        homeplace: homeplace,
+      };
+      const id = getSub();
+      const response = await apiPut(`/users/${id}`, data);
+      if (response.status === HttpStatusCode.InternalServerError) {
+        navigate("/500");
+      }
+      if (imageBase64 !== "") {
+        const imageData = {
+          data: imageBase64,
+        };
+        await apiPut(`/users/${id}/image`, imageData);
+      }
+      navigate(-1);
+    } catch (error) {
+      console.error("Error during updating the user:", error);
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleImageChange = (e) => {
@@ -129,11 +153,23 @@ const EditUserForm = () => {
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-light text-white"
               />
             </div>
+            {loading ? (
+              <div className="flex items-center justify-center">
+                <Loader />
+              </div>
+            ) : (
+              <button
+                type="submit"
+                className="w-full py-2 bg-blue-light text-white rounded-md hover:bg-blue transition-colors"
+              >
+                Modificar usuario
+              </button>
+            )}
             <button
-              type="submit"
-              className="w-full py-2 bg-blue-light text-white rounded-md hover:bg-blue transition-colors"
+              className="w-full py-2 text-white rounded-md transition-colors"
+              onClick={() => navigate(-1)}
             >
-              Crear evento
+              Volver
             </button>
           </form>
         </div>

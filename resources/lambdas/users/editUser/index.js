@@ -1,5 +1,6 @@
 const AWS = require("aws-sdk");
 const cognito = new AWS.CognitoIdentityServiceProvider();
+const jwt = require("jsonwebtoken");
 
 exports.handler = async (event, context) => {
   try {
@@ -12,7 +13,7 @@ exports.handler = async (event, context) => {
 
     // Check UUID of the user making the request
     const authorizationHeader =
-    event.headers.Authorization || event.headers.authorization;
+      event.headers.Authorization || event.headers.authorization;
 
     if (!authorizationHeader) {
       return {
@@ -40,9 +41,6 @@ exports.handler = async (event, context) => {
 
     // ID of the user making the request
     const userUuid = decodedToken.sub;
-    
-    const pathUserId =
-      event.params && event.params.path && event.params.path.id;
 
     if (!userUuid) {
       return {
@@ -52,6 +50,8 @@ exports.handler = async (event, context) => {
         }),
       };
     }
+
+    const pathUserId = event.pathParameters.id;
 
     if (!pathUserId || pathUserId !== userUuid) {
       return {
