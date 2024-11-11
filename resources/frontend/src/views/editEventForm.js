@@ -107,7 +107,7 @@ const EditEventForm = () => {
         category_id: Number(categoryId),
         user_id: Number(getAccessToken()),
       };
-      const response = await apiPut("/events", data);
+      const response = await apiPut(`/events/${id}`, data);
       const eventId = response.data.eventId;
       if (imageBase64 !== "") {
         const imageData = {
