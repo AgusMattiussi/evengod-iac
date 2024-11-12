@@ -1,16 +1,17 @@
 import React, { useEffect } from 'react';
+import { jwtDecode } from "jwt-decode";
+
+const CLIENT_ID = "102897822622-j0m36vpo56fqetqb0sbf2k9rtv6tp9m7.apps.googleusercontent.com";
 
 const GoogleSignIn = () => {
   useEffect(() => {
-    // Dynamically add the Google script
-    const script = document.createElement('script');
-    script.src = 'https://accounts.google.com/gsi/client';
+    const script = document.createElement("script");
+    script.src = "https://accounts.google.com/gsi/client";
     script.async = true;
     script.onload = initializeGoogleSignIn;
     document.body.appendChild(script);
 
     return () => {
-      // Clean up the script when the component unmounts
       document.body.removeChild(script);
     };
   }, []);
@@ -18,29 +19,46 @@ const GoogleSignIn = () => {
   const initializeGoogleSignIn = () => {
     if (window.google) {
       window.google.accounts.id.initialize({
-        client_id: '102897822622-j0m36vpo56fqetqb0sbf2k9rtv6tp9m7.apps.googleusercontent.com', // Replace with your Google client ID
+        client_id: CLIENT_ID,
         callback: handleCredentialResponse,
       });
 
-      // Render the Google Sign-In button
       window.google.accounts.id.renderButton(
-        document.getElementById('google-signin-button'),
-        { theme: 'outline', size: 'large' } // Button customization
+        document.getElementById("google-signin-button"),
+        { theme: "outline", size: "large" }
       );
-
-      // Optionally enable One Tap
-      window.google.accounts.id.prompt();
     }
   };
 
-  const handleCredentialResponse = (response) => {
-    console.log('Encoded JWT ID token: ' + response.credential);
-    // You can send the token to your backend for verification
+  const handleCredentialResponse = async (response) => {
+    console.log("Google Token Received:", response.credential);
+  
+    const googleToken = response.credential;
+    const decodedToken = jwtDecode(googleToken);
+    const { email } = decodedToken;
+  
+    try {
+      const result = await fetch("https://vlf2ioj8o1.execute-api.us-east-1.amazonaws.com/prod/googleLogin", {
+        method: "POST",
+        body: JSON.stringify({ googleToken, email }),
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+  
+      if (result.ok) {
+        console.log("User linked successfully");
+      } else {
+        console.error("Error linking user", await result.json());
+      }
+    } catch (error) {
+      console.error("Error linking Google user:", error);
+    }
   };
+  
 
   return (
     <div>
-      {/* Placeholder for the Google Sign-In button */}
       <div id="google-signin-button"></div>
     </div>
   );
