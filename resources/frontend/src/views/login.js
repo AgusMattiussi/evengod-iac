@@ -13,7 +13,7 @@ const Login = () => {
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
 
-  const { userInfo, setAccessToken } = useSharedAuth();
+  const { setAccessToken } = useSharedAuth();
 
   const handleSignUpRedirect = () => {
     navigate("/signup");
@@ -84,24 +84,26 @@ const Login = () => {
                 <Loader />
               </div>
             ) : (
-              <button
-                type="submit"
-                className="w-full py-2 bg-blue-light text-white rounded-md hover:bg-blue transition-colors"
-              >
-                Ingresar
-              </button>
+              <>
+                <button
+                  type="submit"
+                  className="w-full py-2 bg-blue-light text-white rounded-md hover:bg-blue transition-colors"
+                >
+                  Ingresar
+                </button>
+                <br />
+                <GoogleSignIn setLoader={setLoading} />
+                <div className="mt-4 text-center">
+                  <button
+                    onClick={handleSignUpRedirect}
+                    className="text-sm text-indigo-600 hover:text-blue-light"
+                  >
+                    ¿No tienes cuenta? Regístrate aquí
+                  </button>
+                </div>
+              </>
             )}
           </form>
-          <br />
-          <GoogleSignIn />
-          <div className="mt-4 text-center">
-            <button
-              onClick={handleSignUpRedirect}
-              className="text-sm text-indigo-600 hover:text-blue-light"
-            >
-              ¿No tienes cuenta? Regístrate aquí
-            </button>
-          </div>
         </div>
       </div>
     </>
