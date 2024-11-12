@@ -13,6 +13,12 @@ variable "mysql_sg_name" {
     description = "Name of the MySQL Security Group"
 }
 
+variable "sns_endpoint_sg_name" {
+    type        = string
+    description = "Name of the SNS Endpoint Security Group"
+  
+}
+
 variable "vpc_id" {
     type        = string
     description = "VPC ID where the Security Groups will be created"

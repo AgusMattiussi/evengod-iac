@@ -29,6 +29,17 @@ resource "aws_security_group" "mysql_sg" {
     }
 }
 
+# ================= VPC Endpoint SNS SG Rules =================
+resource "aws_security_group" "sns_endpoint_sg" {
+  name        = var.sns_endpoint_sg_name
+  description = "Security Group for SNS VPC Endpoint"
+  vpc_id      = var.vpc_id
+
+  tags = {
+    Name = var.sns_endpoint_sg_name
+  }
+}
+
 # 2. Create the rules for the SGs
 
 # ================= Lambda SG Rules =================
@@ -62,6 +73,16 @@ resource "aws_security_group_rule" "lambda_to_s3gateway" {
   description       = "Allow outbound traffic from Lambda to S3 Gateway"
 }
 
+resource "aws_security_group_rule" "lambda_to_sns_endpoint" {
+  type              = "egress"
+  from_port         = 443
+  to_port           = 443
+  protocol          = "tcp"
+  security_group_id = aws_security_group.lambda_sg.id
+  cidr_blocks       = ["0.0.0.0/0"]
+  description       = "Allow outbound HTTPS traffic from Lambda to SNS Endpoint"
+}
+
 # ================= RDS Proxy SG Rules =================
 resource "aws_security_group_rule" "rdsproxy_from_lambda" {
   type              = "ingress"
@@ -92,4 +113,15 @@ resource "aws_security_group_rule" "mysql_from_rdsproxy" {
   security_group_id = aws_security_group.mysql_sg.id
   source_security_group_id = aws_security_group.rdsproxy_sg.id
   description       = "Allow inbound traffic from RDS Proxy to MySQL"
+}
+
+# ================= SNS Endpoint SG Rules =================
+resource "aws_security_group_rule" "sns_endpoint_from_lambda" {
+  type              = "ingress"
+  from_port         = 443
+  to_port           = 443
+  protocol          = "tcp"
+  security_group_id = aws_security_group.sns_endpoint_sg.id
+  source_security_group_id = aws_security_group.lambda_sg.id
+  description       = "Allow inbound HTTPS traffic from Lambda to SNS Endpoint"
 }

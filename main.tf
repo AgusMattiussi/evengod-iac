@@ -12,7 +12,7 @@ module "vpc" {
 
 # ================= VPC Endpoints =================
 module "vpc_endpoints" {
-  depends_on = [module.vpc]
+  depends_on = [module.vpc, module.security_groups]
 
   source = "terraform-aws-modules/vpc/aws//modules/vpc-endpoints"
 
@@ -38,11 +38,25 @@ module "vpc_endpoints" {
         Name = var.vpc_endpoint_s3_name
       }
     },
+    // the sns endpoint is an Interface endpoint (it creates an ENI in the subnet)
+    // and it is private (no public DNS)
     sns = {
       service             = "sns"
       subnets             = data.aws_subnets.lambdas_subnets.ids
       vpc_endpoint_type   = "Interface"
       private_dns_enabled = true
+      security_group_ids  = [module.security_groups.sns_endpoint_sg_id]
+      policy = jsonencode({
+        Version = "2008-10-17"
+        Statement = [
+          {
+            "Effect" : "Allow",
+            "Principal" : "*",
+            "Action" : "*",
+            "Resource" : "*"
+          }
+        ]
+      })
       tags = {
         Name = var.vpc_endpoint_sns_name
       }
@@ -78,6 +92,7 @@ module "security_groups" {
   lambda_sg_name   = var.lambda_sg_name
   rdsproxy_sg_name = var.rds_proxy_sg_name
   mysql_sg_name    = var.my_sql_sg_name
+  sns_endpoint_sg_name = var.sns_endpoint_sg_name
   vpc_id           = module.vpc.id
 
 }

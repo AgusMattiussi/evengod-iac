@@ -10,6 +10,7 @@ frontend_bucket_name = "evengod-frontend"
 lambda_sg_name    = "lambda-sg"
 rds_proxy_sg_name = "rdsproxy-sg"
 my_sql_sg_name    = "mysql-sg"
+sns_endpoint_sg_name = "sns-endpoint-sg"
 
 rds_db_identifier = "evengod-db"
 rds_db_name       = "evengoddb"
