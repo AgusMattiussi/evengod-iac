@@ -1,3 +1,10 @@
+# Google Log In
+resource "aws_api_gateway_resource" "google_log_in" {
+  rest_api_id = var.rest_api_id
+  parent_id   = var.root_resource_id
+  path_part   = "googleLogin"
+}
+
 # Users resources
 resource "aws_api_gateway_resource" "users" {
   rest_api_id = var.rest_api_id

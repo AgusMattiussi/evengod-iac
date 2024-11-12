@@ -124,6 +124,12 @@ lambda_functions = [
     source_dir = "inscriptions/getInscriptions"
   },
   {
+    name       = "googleLogin"
+    handler    = "index.handler"
+    runtime    = "nodejs20.x"
+    source_dir = "googleLogin"
+  },
+  {
     name       = "createUser"
     handler    = "index.handler"
     runtime    = "nodejs20.x"
