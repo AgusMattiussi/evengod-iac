@@ -32,6 +32,15 @@ api_description = "REST API for evengod services"
 stage_name = "prod"
 
 # lambdas
+sns_lambda_functions = [
+  {
+    name       = "snsPublisher"
+    handler    = "index.handler"
+    runtime    = "nodejs20.x"
+    source_dir = "sns_publisher/"
+  }
+]
+
 lambda_functions = [
   {
     name       = "getCategories"

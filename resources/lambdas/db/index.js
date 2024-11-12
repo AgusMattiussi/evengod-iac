@@ -24,6 +24,7 @@ CREATE TABLE IF NOT EXISTS events (
     state VARCHAR(50),
     location VARCHAR(100),
     image_url TEXT,
+    topic_arn TEXT,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     FOREIGN KEY(category_id) REFERENCES categories(id) ON DELETE SET DEFAULT
@@ -36,6 +37,7 @@ CREATE TABLE IF NOT EXISTS inscriptions (
     user_uuid VARCHAR(36),
     event_id INT,
     state VARCHAR(50),
+    notification_arn TEXT,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     FOREIGN KEY(event_id) REFERENCES events(id) ON DELETE CASCADE,

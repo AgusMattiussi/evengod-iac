@@ -103,7 +103,6 @@ module "cognito" {
   google_client_secret = var.google_client_secret
 }
 
-
 # ================= Lambda layer =================
 resource "aws_lambda_layer_version" "common_dependencies" {
   filename   = "${path.module}/lambda_layer.zip"
@@ -114,10 +113,42 @@ resource "aws_lambda_layer_version" "common_dependencies" {
   source_code_hash = filebase64sha256("${path.module}/lambda_layer.zip")
 }
 
+# ================ SNS (Lambda listening to EventBridge for publications, and sends them through SNS) ================
+module "sns_lambda_functions" {
+  depends_on = [module.security_groups, module.rds_mysql, module.s3_images]
+  source     = "./modules/sns_lambdas"
+  for_each   = { for fn in var.sns_lambda_functions : fn.name => fn }
+
+  function_name          = each.value.name
+  handler                = each.value.handler
+  runtime                = each.value.runtime
+  source_dir             = "${local.lambdas_dir}/${each.value.source_dir}"
+  role                   = data.aws_iam_role.lab_role.arn
+  layer_arn              = aws_lambda_layer_version.common_dependencies.arn
+  vpc_subnet_ids         = data.aws_subnets.lambdas_subnets.ids
+  vpc_security_group_ids = [module.security_groups.lambda_sg_id]
+
+  environment_variables = {
+    RDS_HOST       = module.rds_mysql.proxy_endpoint
+    DB_USERNAME    = var.rds_db_username
+    DB_PASSWORD    = var.rds_db_password
+    DB_NAME        = var.rds_db_name
+    S3_BUCKET_NAME = "${var.images_bucket_name}-${random_string.random_suffix.result}"
+    USER_POOL_ID   = module.cognito.id
+    CLIENT_ID      = module.cognito.client_id
+  }
+}
+
 
 # ================= Lambda functions =================
+locals {
+  sns_lambda_functions_arn = {
+    for name, lambda in module.sns_lambda_functions : name => lambda.function_arn
+  }
+}
+
 module "lambda_functions" {
-  depends_on = [module.security_groups, module.rds_mysql, module.s3_images]
+  depends_on = [module.sns_lambda_functions, module.security_groups, module.rds_mysql, module.s3_images]
   source     = "./modules/lambdas"
   for_each   = { for fn in var.lambda_functions : fn.name => fn }
 
@@ -138,6 +169,7 @@ module "lambda_functions" {
     S3_BUCKET_NAME = "${var.images_bucket_name}-${random_string.random_suffix.result}"
     USER_POOL_ID   = module.cognito.id
     CLIENT_ID      = module.cognito.client_id
+    LAMBDA_SNS_PUBLISHER = values(local.sns_lambda_functions_arn)[0]
   }
 }
 
@@ -153,7 +185,6 @@ resource "null_resource" "invoke_db" {
     lambda_source_code = module.lambda_functions["setupDB"].source_code_hash
   }
 }
-
 
 # =============== REST API ===========================
 

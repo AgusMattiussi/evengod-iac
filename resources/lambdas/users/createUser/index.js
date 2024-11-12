@@ -1,4 +1,5 @@
 const AWS = require("aws-sdk");
+const sns = new AWS.SNS();
 
 AWS.config.update({
   region: "us-east-1",
@@ -46,6 +47,24 @@ exports.handler = async (event) => {
         Username: email,
       })
       .promise();
+
+    // Send a welcome email to the user
+    const topicArn = process.env.WELCOME_EMAIL_TOPIC_ARN;
+
+    await sns.subscribe({
+      Protocol: "email",
+      TopicArn: topicArn,
+      Endpoint: email,
+    }).promise();
+
+    const subject = "¡Bienvenido a Evengod!";
+    const message = `Hola ${username}, bienvenido a nuestra plataforma. Diríjase a nuestra página principal para empezar a ver eventos.`;
+
+    await sns.publish({
+      Message: message,
+      Subject: subject,
+      TopicArn: topicArn,
+    }).promise();
 
     return {
       statusCode: 201,

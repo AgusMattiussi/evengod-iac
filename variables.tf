@@ -88,6 +88,16 @@ variable "user_pool_name" {
   type        = string
 }
 
+variable "sns_lambda_functions" {
+  description = "List of Lambda functions used by sns to deploy"
+  type        = list(object({
+    name    = string
+    handler = string
+    runtime = string
+    source_dir = string
+  }))
+}
+
 variable "lambda_functions" {
   description = "List of Lambda functions to deploy"
   type        = list(object({
