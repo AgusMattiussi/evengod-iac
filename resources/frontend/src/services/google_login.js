@@ -42,14 +42,28 @@ const GoogleSignIn = ({ setLoader }) => {
     const decodedToken = jwtDecode(googleToken);
     const { email } = decodedToken;
 
-    try {
-      const body = JSON.stringify({ googleToken, email });
-      const response = await apiPost("/googleLogin", body);
-      const sub = jwtDecode(response.data.AccessToken).sub;
-
-      if (response.data) {
-        console.log("User linked successfully");
-        console.log("Setting tokens in local storage");
+            if (response.data) {
+                console.log("User linked successfully");
+                //console.log("Result: ", response);
+                //console.log("Result body: ", response.data);
+                
+                console.log("Setting tokens in local storage");
+                localStorage.setItem(
+                    "accessToken",
+                    response.data.AccessToken || ""
+                );
+                localStorage.setItem(
+                    "refreshToken",
+                    response.data.RefreshToken || ""
+                );
+                localStorage.setItem("idToken", response.data.IdToken || "");
+                localStorage.setItem(
+                    "sub",
+                    jwtDecode(response.data.AccessToken).sub || ""
+                );
+            
+                await setAccessToken(response);
+                navigate("/");
 
         localStorage.setItem("accessToken", response.data.AccessToken || "");
         localStorage.setItem("refreshToken", response.data.RefreshToken || "");
