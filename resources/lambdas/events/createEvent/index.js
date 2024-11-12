@@ -119,6 +119,7 @@ exports.handler = async (event, context) => {
     const targetDateTime = new Date(start_date);
     const notificationDate = new Date(targetDateTime);
     // notificationDate.setDate(targetDateTime.getDate() - 1);
+    // TODO: Check if this is minus 5 mins or set to 5 mins
     notificationDate.setMinutes(targetDateTime.getMinutes() - 5);
 
     // Formato de la fecha en cron (hora UTC, aquí 9:00 AM)
@@ -139,8 +140,8 @@ exports.handler = async (event, context) => {
         Rule: ruleName,
         Targets: [
             {
-                Id: "1",
-                Arn: process.env.AWS_LAMBDA_FUNCTION_NAME,  // Nombre de esta Lambda
+                Id: "event_"+result.insertId,    // TODO: Change
+                Arn: process.env.LAMBDA_SNS_PUBLISHER,  // Nombre de esta Lambda
                 Input: JSON.stringify({
                     topicArn: topicArn,
                     message: `El evento ${title} comienza mañana. A continuación los detalles del mismo:\n
