@@ -19,6 +19,7 @@ rds_db_username = "admin"
 rds_db_password = "admin123"
 
 vpc_endpoint_s3_name = "s3-images-vpc-endpoint"
+vpc_endpoint_sns_name = "sns-vpc-endpoint"
 
 # cognito
 cognito_domain          = "evengod"

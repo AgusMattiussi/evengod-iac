@@ -63,6 +63,11 @@ variable "rds_db_password" {
   type        = string
 }
 
+variable "vpc_endpoint_sns_name" {
+  description = "Name of the VPC endpoint for SNS"
+  type        = string
+}
+
 variable "vpc_endpoint_s3_name" {
   description = "Name of the VPC endpoint for S3"
   type        = string

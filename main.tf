@@ -37,6 +37,15 @@ module "vpc_endpoints" {
       tags = {
         Name = var.vpc_endpoint_s3_name
       }
+    },
+    sns = {
+      service             = "sns"
+      subnets             = data.aws_subnets.lambdas_subnets.ids
+      vpc_endpoint_type   = "Interface"
+      private_dns_enabled = true
+      tags = {
+        Name = var.vpc_endpoint_sns_name
+      }
     }
   }
 }
