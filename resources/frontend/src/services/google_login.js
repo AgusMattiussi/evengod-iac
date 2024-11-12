@@ -42,41 +42,23 @@ const GoogleSignIn = ({ setLoader }) => {
     const decodedToken = jwtDecode(googleToken);
     const { email } = decodedToken;
 
-            if (response.data) {
-                console.log("User linked successfully");
-                //console.log("Result: ", response);
-                //console.log("Result body: ", response.data);
-                
-                console.log("Setting tokens in local storage");
-                localStorage.setItem(
-                    "accessToken",
-                    response.data.AccessToken || ""
-                );
-                localStorage.setItem(
-                    "refreshToken",
-                    response.data.RefreshToken || ""
-                );
-                localStorage.setItem("idToken", response.data.IdToken || "");
-                localStorage.setItem(
-                    "sub",
-                    jwtDecode(response.data.AccessToken).sub || ""
-                );
-            
-                await setAccessToken(response);
-                navigate("/");
+    try {
+      const body = JSON.stringify({ googleToken, email });
+      const response = await apiPost("/googleLogin", body);
+
+      if (response.data) {
+        console.log("User linked successfully");
+        console.log("Setting tokens in local storage");
 
         localStorage.setItem("accessToken", response.data.AccessToken || "");
         localStorage.setItem("refreshToken", response.data.RefreshToken || "");
         localStorage.setItem("idToken", response.data.IdToken || "");
-        localStorage.setItem("sub", sub || "");
-
-        if(response.data.isNewUser) {
-            await apiPut(`/users/${sub}/image`, JSON.stringify({ "imageUrl": decodedToken.picture }));
-            console.log("Image uploaded successfully");
-        }
+        localStorage.setItem(
+          "sub",
+          jwtDecode(response.data.AccessToken).sub || ""
+        );
 
         await setAccessToken(response);
-
         navigate("/");
       } else {
         console.error("Error linking user");
