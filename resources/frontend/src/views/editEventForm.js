@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback } from "react";
 import Header from "../components/header";
 import { useNavigate, useParams } from "react-router-dom";
-import { apiPost, apiGet, apiPut } from "../services/api";
+import { apiGet, apiPut } from "../services/api";
 import { Loader } from "../components/loader";
 import { HttpStatusCode } from "axios";
 import { useSharedAuth } from "../services/auth";
@@ -26,6 +26,7 @@ const EditEventForm = () => {
 
   const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [responseLoading, setResponseLoading] = useState(false);
 
   const fetchCategories = async () => {
     try {
@@ -55,6 +56,13 @@ const EditEventForm = () => {
         setEvent({});
       } else {
         setEvent(response.data);
+        setTitle(response.data.title);
+        setDescription(response.data.description);
+        setStartDate(response.data.start_date);
+        setEndDate(response.data.end_date);
+        setModality(response.data.modality);
+        setLocation(response.data.location);
+        setVirtualRoomLink(response.data.virtual_room_link);
         setCategoryId(response.data.category_id);
       }
     } catch (error) {
@@ -73,11 +81,15 @@ const EditEventForm = () => {
 
   const parseToISOString = (dateString) => {
     const date = new Date(dateString);
-    return date.toISOString(); // Añade 00:00:00.000Z
+    const now = new Date();
+    date.setHours(now.getHours());
+    date.setMinutes(now.getMinutes());
+    return date.toISOString();
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setResponseLoading(true);
     const isoStartDate = parseToISOString(startDate);
     const isoEndDate = parseToISOString(endDate);
     try {
@@ -95,7 +107,7 @@ const EditEventForm = () => {
         category_id: Number(categoryId),
         user_id: Number(getAccessToken()),
       };
-      const response = await apiPost("/events", data);
+      const response = await apiPut(`/events/${id}`, data);
       const eventId = response.data.eventId;
       if (imageBase64 !== "") {
         const imageData = {
@@ -105,7 +117,9 @@ const EditEventForm = () => {
       }
       navigate("/");
     } catch (error) {
-      console.error("Error during creation of event:", error);
+      console.error("Error during updating the event:", error);
+    } finally {
+      setResponseLoading(false);
     }
   };
 
@@ -140,7 +154,6 @@ const EditEventForm = () => {
                 style={{ color: "black" }}
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
                 placeholder={event.title}
-                required
               />
             </div>
             <div>
@@ -157,7 +170,6 @@ const EditEventForm = () => {
                 style={{ color: "black" }}
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-light"
                 placeholder={event.description}
-                required
               ></textarea>
             </div>
             <div>
@@ -173,7 +185,6 @@ const EditEventForm = () => {
                 style={{ color: "black" }}
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
                 placeholder={event.location}
-                required
               />
             </div>
             <div>
@@ -188,7 +199,6 @@ const EditEventForm = () => {
                 id="startdate"
                 onChange={(e) => setStartDate(e.target.value)}
                 className="w-full px-3 py-2 borderrounded-md focus:outline-none focus:ring-2 focus:ring-blue-light text-blue-darker"
-                required
               />
             </div>
             <div>
@@ -203,7 +213,6 @@ const EditEventForm = () => {
                 id="endDate"
                 onChange={(e) => setEndDate(e.target.value)}
                 className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-light text-blue-darker"
-                required
               />
             </div>
             <div>
@@ -271,7 +280,6 @@ const EditEventForm = () => {
                   style={{ color: "black" }}
                   className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
                   placeholder={event.virtual_room_link}
-                  required
                 />
               </div>
             ) : (
@@ -320,12 +328,18 @@ const EditEventForm = () => {
                 placeholder={event.image_url}
               />
             </div>
-            <button
-              type="submit"
-              className="w-full py-2 bg-blue-light text-white rounded-md hover:bg-blue transition-colors"
-            >
-              Crear evento
-            </button>
+            {responseLoading ? (
+              <div className="flex items-center justify-center">
+                <Loader />
+              </div>
+            ) : (
+              <button
+                type="submit"
+                className="w-full py-2 bg-blue-light text-white rounded-md hover:bg-blue transition-colors"
+              >
+                Modificar evento
+              </button>
+            )}
             <button
               className="w-full py-2 text-white rounded-md transition-colors"
               onClick={() => navigate(-1)}

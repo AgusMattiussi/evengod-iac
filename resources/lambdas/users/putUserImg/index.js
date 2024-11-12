@@ -46,6 +46,8 @@ exports.handler = async (event, context) => {
       };
     }
 
+    const pathUserId = event.pathParameters.id;
+
     if (!pathUserId || pathUserId !== userUuid) {
       return {
         statusCode: 400,
@@ -54,9 +56,6 @@ exports.handler = async (event, context) => {
         }),
       };
     }
-
-    const pathUserId =
-      event.params && event.params.path && event.pathParameters.id;
 
     const { data } = JSON.parse(event.body);
     const bucketName = process.env.S3_BUCKET_NAME;

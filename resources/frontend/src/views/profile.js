@@ -98,7 +98,11 @@ const Profile = () => {
               <main className="grid grid-cols-1 lg:grid-cols-3">
                 <div className="lg:col-span-1 mx-10">
                   <img
-                    src={defaultProfileImage}
+                    src={
+                      user.profile_image_url
+                        ? user.profile_image_url
+                        : defaultProfileImage
+                    }
                     alt="Conference"
                     className="size-64 rounded-lg shadow-lg mr-8"
                   />
