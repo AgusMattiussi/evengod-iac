@@ -52,7 +52,8 @@ const GoogleSignIn = () => {
                 console.log("User linked successfully");
                 //console.log("Result: ", response);
                 //console.log("Result body: ", response.data);
-
+                
+                console.log("Setting tokens in local storage");
                 localStorage.setItem(
                     "accessToken",
                     response.data.AccessToken || ""
