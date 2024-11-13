@@ -123,13 +123,11 @@ async function createCognitoUser(email, name) {
 }
 
 async function adminSetUserPassword(username) {
-    // Generate a secure random password
     const password = Math.random().toString(36).slice(-8) + 
                     Math.random().toString(36).slice(-8).toUpperCase() + 
                     Math.random().toString(9).slice(-4) + 
                     '#@';
 
-    // Set the password for the user
     await cognito.adminSetUserPassword({
         UserPoolId: process.env.USER_POOL_ID,
         Username: username,
