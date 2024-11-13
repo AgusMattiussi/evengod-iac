@@ -10,6 +10,8 @@ frontend_bucket_name = "evengod-frontend"
 lambda_sg_name    = "lambda-sg"
 rds_proxy_sg_name = "rdsproxy-sg"
 my_sql_sg_name    = "mysql-sg"
+sns_endpoint_sg_name = "sns-endpoint-sg"
+events_endpoint_sg_name = "events-endpoint-sg"
 
 rds_db_identifier = "evengod-db"
 rds_db_name       = "evengoddb"
@@ -19,6 +21,7 @@ rds_db_username = "admin"
 rds_db_password = "admin123"
 
 vpc_endpoint_s3_name = "s3-images-vpc-endpoint"
+vpc_endpoint_sns_name = "sns-vpc-endpoint"
 
 # cognito
 cognito_domain          = "evengod"
@@ -32,6 +35,15 @@ api_description = "REST API for evengod services"
 stage_name = "prod"
 
 # lambdas
+sns_lambda_functions = [
+  {
+    name       = "snsPublisher"
+    handler    = "index.handler"
+    runtime    = "nodejs20.x"
+    source_dir = "sns_publisher/"
+  }
+]
+
 lambda_functions = [
   {
     name       = "getCategories"
@@ -112,12 +124,6 @@ lambda_functions = [
     source_dir = "inscriptions/getInscriptions"
   },
   {
-    name       = "googleLogin"
-    handler    = "index.handler"
-    runtime    = "nodejs20.x"
-    source_dir = "googleLogin"
-  },
-  {
     name       = "createUser"
     handler    = "index.handler"
     runtime    = "nodejs20.x"
@@ -166,4 +172,3 @@ lambda_functions = [
     source_dir = "db/"
   }
 ]
-

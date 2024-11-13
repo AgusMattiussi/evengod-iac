@@ -12,7 +12,7 @@ module "vpc" {
 
 # ================= VPC Endpoints =================
 module "vpc_endpoints" {
-  depends_on = [module.vpc]
+  depends_on = [module.vpc, module.security_groups]
 
   source = "terraform-aws-modules/vpc/aws//modules/vpc-endpoints"
 
@@ -36,6 +36,53 @@ module "vpc_endpoints" {
       })
       tags = {
         Name = var.vpc_endpoint_s3_name
+      }
+    },
+    // the sns endpoint is an Interface endpoint (it creates an ENI in the subnet)
+    // and it is private (no public DNS)
+    sns = {
+      service = "sns"
+      subnet_ids = [
+        module.vpc.private_subnets[0], # Usa solo private-subnet-1 de us-east-1a
+        module.vpc.private_subnets[1]  # Usa solo private-subnet-2 de us-east-1b
+      ]
+      vpc_endpoint_type   = "Interface"
+      private_dns_enabled = true
+      security_group_ids  = [module.security_groups.sns_endpoint_sg_id]
+      policy = jsonencode({
+        Version = "2008-10-17"
+        Statement = [
+          {
+            "Effect" : "Allow",
+            "Principal" : "*",
+            "Action" : "*",
+            "Resource" : "*"
+          }
+        ]
+      })
+      tags = {
+        Name = var.vpc_endpoint_sns_name
+      }
+    },
+    events = {
+      service             = "events"
+      vpc_endpoint_type   = "Interface"
+      subnet_ids          = [module.vpc.private_subnets[0], module.vpc.private_subnets[1]] # Una subnet por AZ
+      private_dns_enabled = true
+      security_group_ids  = [module.security_groups.events_endpoint_sg_id]
+      policy = jsonencode({
+        Version = "2008-10-17"
+        Statement = [
+          {
+            Effect    = "Allow"
+            Principal = "*"
+            Action    = "*"
+            Resource  = "*"
+          }
+        ]
+      })
+      tags = {
+        Name = "events-vpc-endpoint"
       }
     }
   }
@@ -66,12 +113,15 @@ module "s3_images" {
 module "security_groups" {
   source = "./modules/security-groups"
 
-  lambda_sg_name   = var.lambda_sg_name
-  rdsproxy_sg_name = var.rds_proxy_sg_name
-  mysql_sg_name    = var.my_sql_sg_name
-  vpc_id           = module.vpc.id
+  lambda_sg_name          = var.lambda_sg_name
+  rdsproxy_sg_name        = var.rds_proxy_sg_name
+  mysql_sg_name           = var.my_sql_sg_name
+  sns_endpoint_sg_name    = var.sns_endpoint_sg_name
+  events_endpoint_sg_name = var.events_endpoint_sg_name
+  vpc_id                  = module.vpc.id
 
 }
+
 
 
 # ================= RDS MySQL =================
@@ -103,7 +153,6 @@ module "cognito" {
   google_client_secret = var.google_client_secret
 }
 
-
 # ================= Lambda layer =================
 resource "aws_lambda_layer_version" "common_dependencies" {
   filename   = "${path.module}/lambda_layer.zip"
@@ -114,12 +163,11 @@ resource "aws_lambda_layer_version" "common_dependencies" {
   source_code_hash = filebase64sha256("${path.module}/lambda_layer.zip")
 }
 
-
-# ================= Lambda functions =================
-module "lambda_functions" {
+# ================ SNS (Lambda listening to EventBridge for publications, and sends them through SNS) ================
+module "sns_lambda_functions" {
   depends_on = [module.security_groups, module.rds_mysql, module.s3_images]
-  source     = "./modules/lambdas"
-  for_each   = { for fn in var.lambda_functions : fn.name => fn }
+  source     = "./modules/sns_lambdas"
+  for_each   = { for fn in var.sns_lambda_functions : fn.name => fn }
 
   function_name          = each.value.name
   handler                = each.value.handler
@@ -127,8 +175,8 @@ module "lambda_functions" {
   source_dir             = "${local.lambdas_dir}/${each.value.source_dir}"
   role                   = data.aws_iam_role.lab_role.arn
   layer_arn              = aws_lambda_layer_version.common_dependencies.arn
-  vpc_subnet_ids         = contains(["createUser", "getUserById", "editUser", "putUserImg", "googleLogin"], each.value.name) ? [] : data.aws_subnets.lambdas_subnets.ids
-  vpc_security_group_ids = contains(["createUser", "getUserById", "editUser", "putUserImg", "googleLogin"], each.value.name) ? [] : [module.security_groups.lambda_sg_id]
+  vpc_subnet_ids         = data.aws_subnets.lambdas_subnets.ids
+  vpc_security_group_ids = [module.security_groups.lambda_sg_id]
 
   environment_variables = {
     RDS_HOST       = module.rds_mysql.proxy_endpoint
@@ -138,6 +186,40 @@ module "lambda_functions" {
     S3_BUCKET_NAME = "${var.images_bucket_name}-${random_string.random_suffix.result}"
     USER_POOL_ID   = module.cognito.id
     CLIENT_ID      = module.cognito.client_id
+  }
+}
+
+
+# ================= Lambda functions =================
+locals {
+  sns_lambda_functions_arn = {
+    for name, lambda in module.sns_lambda_functions : name => lambda.function_arn
+  }
+}
+
+module "lambda_functions" {
+  depends_on = [module.sns_lambda_functions, module.security_groups, module.rds_mysql, module.s3_images]
+  source     = "./modules/lambdas"
+  for_each   = { for fn in var.lambda_functions : fn.name => fn }
+
+  function_name          = each.value.name
+  handler                = each.value.handler
+  runtime                = each.value.runtime
+  source_dir             = "${local.lambdas_dir}/${each.value.source_dir}"
+  role                   = data.aws_iam_role.lab_role.arn
+  layer_arn              = aws_lambda_layer_version.common_dependencies.arn
+  vpc_subnet_ids         = contains(["createUser", "getUserById", "editUser", "putUserImg"], each.value.name) ? [] : data.aws_subnets.lambdas_subnets.ids
+  vpc_security_group_ids = contains(["createUser", "getUserById", "editUser", "putUserImg"], each.value.name) ? [] : [module.security_groups.lambda_sg_id]
+
+  environment_variables = {
+    RDS_HOST       = module.rds_mysql.proxy_endpoint
+    DB_USERNAME    = var.rds_db_username
+    DB_PASSWORD    = var.rds_db_password
+    DB_NAME        = var.rds_db_name
+    S3_BUCKET_NAME = "${var.images_bucket_name}-${random_string.random_suffix.result}"
+    USER_POOL_ID   = module.cognito.id
+    CLIENT_ID      = module.cognito.client_id
+    LAMBDA_SNS_PUBLISHER = values(local.sns_lambda_functions_arn)[0]
   }
 }
 
@@ -153,7 +235,6 @@ resource "null_resource" "invoke_db" {
     lambda_source_code = module.lambda_functions["setupDB"].source_code_hash
   }
 }
-
 
 # =============== REST API ===========================
 

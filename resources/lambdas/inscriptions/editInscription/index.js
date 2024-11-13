@@ -36,6 +36,66 @@ exports.handler = async (event, context) => {
       };
     }
 
+    // let notificationArn = null;
+
+    // if (state === "Cancelled") {
+    //   const [rows] = await connection.execute(
+    //     "SELECT notification_arn FROM inscriptions WHERE id = ?",
+    //     [inscriptionId]
+    //   );
+
+    //   if (rows.length === 0) {
+    //     return {
+    //       statusCode: 404,
+    //       body: JSON.stringify({
+    //         message: `Inscription with id ${inscriptionId} not found`,
+    //       }),
+    //     };
+    //   }
+
+    //   sns.unsubscribe({ SubscriptionArn: rows[0].notification_arn }).promise();
+    // } else {
+    //   const [rows] = await connection.execute(
+    //     "SELECT event_id FROM inscriptions WHERE id = ?",
+    //     [inscriptionId]
+    //   );
+
+    //   if (rows.length === 0) {
+    //     return {
+    //       statusCode: 404,
+    //       body: JSON.stringify({
+    //         message: `Inscription with id ${inscriptionId} not found`,
+    //       }),
+    //     };
+    //   }
+
+    //   const [eventRows] = await connection.execute(
+    //     "SELECT topic_arn FROM events WHERE id = ?",
+    //     [rows[0].event_id]
+    //   );
+
+    //   if (eventRows.length === 0) {
+    //     return {
+    //       statusCode: 404,
+    //       body: JSON.stringify({
+    //         message: `Event with id ${rows[0].event_id} not found`,
+    //       }),
+    //     };
+    //   }
+
+    //   const topicArn = eventRows[0].topic_arn;
+
+    //   const { SubscriptionArn } = await sns
+    //     .subscribe({
+    //       Protocol: "email",
+    //       TopicArn: topicArn,
+    //       Endpoint: decodedToken.email,
+    //     })
+    //     .promise();
+      
+    //   notificationArn = SubscriptionArn;
+    // }
+
     connection = await mysql.createConnection(dbConfig);
 
     const query =

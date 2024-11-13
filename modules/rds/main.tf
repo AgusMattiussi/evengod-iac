@@ -35,7 +35,7 @@ resource "aws_db_instance" "mysql_rds" {
 
 # ================= RDS Proxy =================
 resource "aws_secretsmanager_secret" "db_credentials" {
-  name = "${var.name}-credentials"
+  name = "${var.name}-credentials-new"
 
   recovery_window_in_days = 0
 }

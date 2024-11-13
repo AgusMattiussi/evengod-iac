@@ -1,4 +1,5 @@
 const AWS = require("aws-sdk");
+const sns = new AWS.SNS();
 
 AWS.config.update({
   region: "us-east-1",
