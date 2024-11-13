@@ -62,6 +62,26 @@ resource "aws_security_group_rule" "lambda_to_s3gateway" {
   description       = "Allow outbound traffic from Lambda to S3 Gateway"
 }
 
+resource "aws_security_group_rule" "lambda_to_lambda_outbound" {
+  type              = "egress"
+  from_port         = 0
+  to_port           = 0
+  protocol          = "-1"
+  security_group_id = aws_security_group.lambda_sg.id
+  source_security_group_id = aws_security_group.lambda_sg.id
+  description       = "Allow outbound traffic from Lambda to Lambda"
+}
+
+resource "aws_security_group_rule" "lambda_to_lambda_inbound" {
+  type              = "ingress"
+  from_port         = 0
+  to_port           = 0
+  protocol          = "-1"
+  security_group_id = aws_security_group.lambda_sg.id
+  source_security_group_id = aws_security_group.lambda_sg.id
+  description       = "Allow inbound traffic from Lambda to Lambda"
+}
+
 # ================= RDS Proxy SG Rules =================
 resource "aws_security_group_rule" "rdsproxy_from_lambda" {
   type              = "ingress"

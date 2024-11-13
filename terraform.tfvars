@@ -168,6 +168,12 @@ lambda_functions = [
     handler    = "index.handler"
     runtime    = "nodejs20.x"
     source_dir = "db/"
+  },
+  {
+    name       = "createEventTopic"
+    handler    = "index.handler"
+    runtime    = "nodejs20.x"
+    source_dir = "events/createEventTopic"
   }
 ]
 
