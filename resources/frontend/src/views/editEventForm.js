@@ -108,12 +108,11 @@ const EditEventForm = () => {
         user_id: Number(getAccessToken()),
       };
       const response = await apiPut(`/events/${id}`, data);
-      const eventId = response.data.eventId;
       if (imageBase64 !== "") {
         const imageData = {
           data: imageBase64,
         };
-        await apiPut(`/events/${eventId}/image`, imageData);
+        await apiPut(`/events/${id}/image`, imageData);
       }
       navigate("/");
     } catch (error) {

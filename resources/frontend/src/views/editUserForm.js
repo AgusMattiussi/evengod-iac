@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback } from "react";
 import Header from "../components/header";
-import { useNavigate, useParams } from "react-router-dom";
-import { apiPost, apiGet, apiPut } from "../services/api";
+import { useNavigate } from "react-router-dom";
+import { apiGet, apiPut } from "../services/api";
 import { Loader } from "../components/loader";
 import { HttpStatusCode } from "axios";
 import { useSharedAuth } from "../services/auth";
@@ -9,7 +9,7 @@ import { useSharedAuth } from "../services/auth";
 const EditUserForm = () => {
   const navigate = useNavigate();
   const [user, setUser] = useState({});
-  const { getAccessToken, getSub } = useSharedAuth();
+  const { setUserInfo, getSub } = useSharedAuth();
 
   const [userName, setUserName] = useState("");
   const [description, setDescription] = useState("");
@@ -28,6 +28,7 @@ const EditUserForm = () => {
         setUser({});
       } else {
         setUser(response.data);
+        setUserInfo(response.data);
       }
     } catch (error) {
       console.error("Error fetching user:", error);
@@ -62,7 +63,8 @@ const EditUserForm = () => {
         };
         await apiPut(`/users/${id}/image`, imageData);
       }
-      navigate(-1);
+      fetchUser();
+      navigate(`/profile/${id}`);
     } catch (error) {
       console.error("Error during updating the user:", error);
     } finally {
@@ -101,7 +103,6 @@ const EditUserForm = () => {
                 style={{ color: "black" }}
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
                 placeholder={user.name}
-                required
               />
             </div>
             <div>
@@ -118,7 +119,6 @@ const EditUserForm = () => {
                 style={{ color: "black" }}
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-light"
                 placeholder={user.description}
-                required
               ></textarea>
             </div>
             <div>
@@ -134,7 +134,6 @@ const EditUserForm = () => {
                 style={{ color: "black" }}
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
                 placeholder={user.homeplace}
-                required
               />
             </div>
 
