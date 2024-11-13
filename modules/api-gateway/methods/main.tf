@@ -5,22 +5,6 @@ locals {
 }
 
 # GOOGLE LOG IN
-resource "aws_api_gateway_method" "google_log_in" {
-  rest_api_id   = var.rest_api_id
-  resource_id   = var.resources["google_log_in"]
-  http_method   = "POST"
-  authorization = "NONE"
-}
-
-resource "aws_api_gateway_integration" "google_log_in" {
-  rest_api_id = var.rest_api_id
-  resource_id = var.resources["google_log_in"]
-  http_method = aws_api_gateway_method.google_log_in.http_method
-
-  integration_http_method = "POST"
-  type                    = "AWS_PROXY"
-  uri                     = "${local.lambda_uri_prefix}/${var.lambda_functions["googleLogin"]}/invocations"
-}
 
 
 
@@ -214,7 +198,7 @@ resource "aws_api_gateway_integration" "create_event" {
 
   integration_http_method = "POST"
   type                    = "AWS_PROXY"
-  uri                     = "${local.lambda_uri_prefix}/${var.lambda_functions["createEventTopic"]}/invocations"
+  uri                     = "${local.lambda_uri_prefix}/${var.lambda_functions["createEvent"]}/invocations"
 }
 
 # GET EVENT BY ID
@@ -457,7 +441,6 @@ resource "aws_api_gateway_integration" "update_inscription" {
 # Method Responses for all methods
 locals {
   methods = {
-    "google_log_in"      = aws_api_gateway_method.google_log_in
     "create_user"        = aws_api_gateway_method.create_user
     "get_user"           = aws_api_gateway_method.get_user
     "update_user"        = aws_api_gateway_method.update_user
@@ -513,7 +496,6 @@ resource "aws_api_gateway_integration_response" "integration_response_200" {
   }
 
   depends_on = [
-    aws_api_gateway_integration.google_log_in,
     aws_api_gateway_integration.create_user,
     aws_api_gateway_integration.get_user,
     aws_api_gateway_integration.update_user,
@@ -583,7 +565,6 @@ resource "aws_api_gateway_integration_response" "error_integration_responses" {
 
   depends_on = [
     aws_api_gateway_method_response.error_responses,
-    aws_api_gateway_integration.google_log_in,
     aws_api_gateway_integration.create_user,
     aws_api_gateway_integration.get_user,
     aws_api_gateway_integration.update_user,

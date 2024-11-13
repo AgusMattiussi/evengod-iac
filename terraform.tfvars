@@ -10,6 +10,8 @@ frontend_bucket_name = "evengod-frontend"
 lambda_sg_name    = "lambda-sg"
 rds_proxy_sg_name = "rdsproxy-sg"
 my_sql_sg_name    = "mysql-sg"
+sns_endpoint_sg_name = "sns-endpoint-sg"
+events_endpoint_sg_name = "events-endpoint-sg"
 
 rds_db_identifier = "evengod-db"
 rds_db_name       = "evengoddb"
@@ -122,12 +124,6 @@ lambda_functions = [
     source_dir = "inscriptions/getInscriptions"
   },
   {
-    name       = "googleLogin"
-    handler    = "index.handler"
-    runtime    = "nodejs20.x"
-    source_dir = "googleLogin"
-  },
-  {
     name       = "createUser"
     handler    = "index.handler"
     runtime    = "nodejs20.x"
@@ -174,12 +170,5 @@ lambda_functions = [
     handler    = "index.handler"
     runtime    = "nodejs20.x"
     source_dir = "db/"
-  },
-  {
-    name       = "createEventTopic"
-    handler    = "index.handler"
-    runtime    = "nodejs20.x"
-    source_dir = "events/createEventTopic"
   }
 ]
-

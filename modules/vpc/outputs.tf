@@ -10,5 +10,5 @@ output "cidr" {
 
 output "private_subnets" {
   description = "IDs of the private subnets"
-  value       = module.private_subnet.*.id
+  value       = module.private_subnet[*].id
 }

@@ -43,6 +43,16 @@ variable "my_sql_sg_name" {
   type        = string
 }
 
+variable "sns_endpoint_sg_name" {
+  description = "Name of the security group for SNS Endpoint"
+  type        = string
+}
+
+variable "events_endpoint_sg_name" {
+  description = "Name of the security group for EventBridge Endpoint"
+  type        = string
+}
+
 variable "rds_db_identifier" {
   description = "Identifier for the RDS instance"
   type        = string
