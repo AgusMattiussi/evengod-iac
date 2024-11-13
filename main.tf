@@ -175,8 +175,8 @@ module "sns_lambda_functions" {
   source_dir             = "${local.lambdas_dir}/${each.value.source_dir}"
   role                   = data.aws_iam_role.lab_role.arn
   layer_arn              = aws_lambda_layer_version.common_dependencies.arn
-  vpc_subnet_ids         = data.aws_subnets.lambdas_subnets.ids
-  vpc_security_group_ids = [module.security_groups.lambda_sg_id]
+  vpc_subnet_ids         = []
+  vpc_security_group_ids = []
 
   environment_variables = {
     RDS_HOST       = module.rds_mysql.proxy_endpoint
@@ -268,6 +268,13 @@ resource "aws_lambda_permission" "api_gateway_lambda" {
   principal     = "apigateway.amazonaws.com"
 
   source_arn = "${module.api_gateway.execution_arn}/*/*"
+}
+
+resource "aws_lambda_permission" "allow_eventbridge_sns_publisher" {
+  statement_id  = "AllowEventBridgeInvoke"
+  action        = "lambda:InvokeFunction"
+  function_name = module.sns_lambda_functions["snsPublisher"].function_name
+  principal     = "events.amazonaws.com"
 }
 
 # =============== Frontend Build =====================
