@@ -57,27 +57,38 @@ exports.handler = async (event, context) => {
       };
     }
 
-    const { data } = JSON.parse(event.body);
+    const eventBody = JSON.parse(event.body);
+    console.log("Event body", eventBody);
+
+    const data = eventBody.data || null;
     const bucketName = process.env.S3_BUCKET_NAME;
 
-    if (!data) {
+    if (!data && !eventBody.imageUrl) {
       return {
         statusCode: 400,
-        body: JSON.stringify({ message: "Missing required fields: data" }),
+        body: JSON.stringify({ message: "Missing required fields: data OR imageUrl" }),
       };
     }
 
+    let imageUrl;
     // Upload picture to S3 bucket
-    const s3Params = {
-      Bucket: bucketName,
-      Key: pathUserId,
-      Body: Buffer.from(data, "base64"),
-      ContentType: "image/jpeg",
-      ACL: "public-read",
-    };
+    if(!eventBody.imageUrl){
+      const s3Params = {
+        Bucket: bucketName,
+        Key: pathUserId,
+        Body: Buffer.from(data, "base64"),
+        ContentType: "image/jpeg",
+        ACL: "public-read",
+      };
 
-    const uploadResult = await s3.upload(s3Params).promise();
-    const imageUrl = uploadResult.Location;
+      const uploadResult = await s3.upload(s3Params).promise();
+      imageUrl = uploadResult.Location;
+    } else {
+      imageUrl = eventBody.imageUrl;
+    }
+
+    console.log("imageUrl: ", imageUrl);
+
 
     // Update picture URL in Cognito
     const updateParams = {
