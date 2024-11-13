@@ -1,5 +1,6 @@
 const mysql = require("mysql2/promise");
 const jwt = require("jsonwebtoken");
+const AWS = require("aws-sdk");
 
 const sns = new AWS.SNS();
 
@@ -69,11 +70,13 @@ exports.handler = async (event, context) => {
     const [rows] = await connection.execute(GET_EVENT_TOPIC_ARN, [event_id]);
     const topicArn = rows[0].topic_arn;
 
-    const { SubscriptionArn } = await sns.subscribe({
-      Protocol: "email",
-      TopicArn: topicArn,
-      Endpoint: decodedToken.email,
-    }).promise();
+    const { SubscriptionArn } = await sns
+      .subscribe({
+        Protocol: "email",
+        TopicArn: topicArn,
+        Endpoint: decodedToken.email,
+      })
+      .promise();
 
     const [result] = await connection.execute(INSERT_INSCRIPTION_QUERY, [
       userUuid,
