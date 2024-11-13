@@ -10,3 +10,11 @@ output "rdsproxy_sg_id" {
 output "mysql_sg_id" {
   value = aws_security_group.mysql_sg.id
 }
+
+output "sns_endpoint_sg_id" {
+  value = aws_security_group.sns_endpoint_sg.id
+}
+
+output "events_endpoint_sg_id" {
+  value = aws_security_group.events_endpoint_sg.id
+}

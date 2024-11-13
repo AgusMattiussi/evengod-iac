@@ -1,6 +1,8 @@
 const mysql = require("mysql2/promise");
 const jwt = require("jsonwebtoken");
 
+const sns = new AWS.SNS();
+
 // Database configuration
 const dbConfig = {
   host: process.env.RDS_HOST,
@@ -10,7 +12,9 @@ const dbConfig = {
 };
 
 const INSERT_INSCRIPTION_QUERY =
-  "INSERT INTO inscriptions (user_uuid, event_id, state) VALUES (?, ?, ?)";
+  "INSERT INTO inscriptions (user_uuid, event_id, state, notification_arn) VALUES (?, ?, ?, ?)";
+
+const GET_EVENT_TOPIC_ARN = "SELECT topic_arn FROM events WHERE id = ?";
 
 // POST /inscriptions endpoint
 exports.handler = async (event, context) => {
@@ -62,11 +66,20 @@ exports.handler = async (event, context) => {
     // Connect to the database
     connection = await mysql.createConnection(dbConfig);
 
-    // Insert the new inscription
+    const [rows] = await connection.execute(GET_EVENT_TOPIC_ARN, [event_id]);
+    const topicArn = rows[0].topic_arn;
+
+    const { SubscriptionArn } = await sns.subscribe({
+      Protocol: "email",
+      TopicArn: topicArn,
+      Endpoint: decodedToken.email,
+    }).promise();
+
     const [result] = await connection.execute(INSERT_INSCRIPTION_QUERY, [
       userUuid,
       event_id,
       state,
+      SubscriptionArn,
     ]);
 
     return {

@@ -43,6 +43,16 @@ variable "my_sql_sg_name" {
   type        = string
 }
 
+variable "sns_endpoint_sg_name" {
+  description = "Name of the security group for SNS Endpoint"
+  type        = string
+}
+
+variable "events_endpoint_sg_name" {
+  description = "Name of the security group for EventBridge Endpoint"
+  type        = string
+}
+
 variable "rds_db_identifier" {
   description = "Identifier for the RDS instance"
   type        = string
@@ -60,6 +70,11 @@ variable "rds_db_username" {
 
 variable "rds_db_password" {
   description = "Password for the RDS database user"
+  type        = string
+}
+
+variable "vpc_endpoint_sns_name" {
+  description = "Name of the VPC endpoint for SNS"
   type        = string
 }
 
@@ -86,6 +101,16 @@ variable "google_client_secret" {
 variable "user_pool_name" {
   description = "Name of the Cognito user pool"
   type        = string
+}
+
+variable "sns_lambda_functions" {
+  description = "List of Lambda functions used by sns to deploy"
+  type        = list(object({
+    name    = string
+    handler = string
+    runtime = string
+    source_dir = string
+  }))
 }
 
 variable "lambda_functions" {
