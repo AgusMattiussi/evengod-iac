@@ -3,6 +3,7 @@ const jwt = require("jsonwebtoken");
 const AWS = require("aws-sdk");
 const sns = new AWS.SNS();
 const eventbridge = new AWS.EventBridge();
+const { v4: uuidv4 } = require("uuid");
 
 // Database configuration
 const dbConfig = {
@@ -92,8 +93,8 @@ exports.handler = async (event, context) => {
     }
 
     console.log("creating sns topic")
-
-    const createTopicResponse = await sns.createTopic({ Name: "event_"+title+"_notifications" }).promise();
+    const topicUuid = uuidv4();
+    const createTopicResponse = await sns.createTopic({ Name: "event_"+topicUuid+"_notifications" }).promise();
     console.log("finish creating topic")
     const topicArn = createTopicResponse.TopicArn
 
