@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "./navbar.css";
 import defaultProfile from "../images/defaultProfile.jpg";
-import { Search, LogOut } from "lucide-react";
+import { LogOut } from "lucide-react";
 import { useSharedAuth } from "../services/auth";
 
 const Navbar = () => {
@@ -16,11 +16,6 @@ const Navbar = () => {
       setUserName(userInfo.name);
     }
   }, [userInfo]);
-
-  // const [isSearchVisible, setIsSearchVisible] = useState(false)
-  // const toggleSearch = () => {
-  //   setIsSearchVisible(!isSearchVisible)
-  // }
 
   const handleLogoutButton = () => {
     handleLogout();
@@ -70,12 +65,6 @@ const Navbar = () => {
         </nav>
       </div>
       <div className="header-right">
-        {/* <div className={`search-bar ${isSearchVisible ? "visible" : ""}`}>
-          <button className="search-icon" onClick={toggleSearch}>
-            <Search size={24} />
-          </button>
-          <input type="text" placeholder="Buscar..." className={isSearchVisible ? "visible" : ""} />
-        </div> */}
         {accessToken ? (
           <>
             <div
@@ -84,7 +73,7 @@ const Navbar = () => {
             >
               <img
                 src={
-                  userInfo.profile_image_url
+                  userInfo?.profile_image_url
                     ? userInfo.profile_image_url
                     : defaultProfile
                 }

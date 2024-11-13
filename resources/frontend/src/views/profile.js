@@ -11,7 +11,7 @@ import MyEventCard from "../components/myEventCard";
 
 const Profile = () => {
   const navigate = useNavigate();
-  const { getSub } = useSharedAuth();
+  const { setUserInfo, getSub } = useSharedAuth();
 
   const [user, setUser] = useState({});
   const [events, setEvents] = useState([]);
@@ -29,9 +29,10 @@ const Profile = () => {
         setUser({});
       } else {
         setUser(response.data);
+        setUserInfo(response.data);
       }
     } catch (error) {
-      console.error("Error fetching event:", error);
+      console.error("Error fetching user:", error);
     } finally {
       setLoading(false);
     }
@@ -65,7 +66,7 @@ const Profile = () => {
       fetchUser();
       fetchEvents(id);
     }
-  }, []);
+  }, [user]);
 
   const handleEditProfile = () => {
     navigate(`/profile/${id}/edit`);
