@@ -48,9 +48,9 @@ const EventForm = () => {
 
   const parseToISOString = (dateString) => {
     const date = new Date(dateString);
-    const now = new Date();
-    date.setHours(now.getHours());
-    date.setMinutes(now.getMinutes());
+    // const now = new Date();
+    // date.setHours(now.getHours());
+    // date.setMinutes(now.getMinutes());
     return date.toISOString();
   };
 
