@@ -19,6 +19,11 @@ variable "sns_endpoint_sg_name" {
   
 }
 
+variable "events_endpoint_sg_name" {
+    type        = string
+    description = "Name of the EventBridge Endpoint Security Group"
+}
+
 variable "vpc_id" {
     type        = string
     description = "VPC ID where the Security Groups will be created"

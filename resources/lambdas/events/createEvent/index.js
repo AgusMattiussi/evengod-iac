@@ -15,7 +15,7 @@ const dbConfig = {
 const INSERT_EVENT_QUERY = `
   INSERT INTO events 
   (title, category_id, description, user_uuid, start_date, end_date, inscriptions_start_date, inscriptions_end_date, virtual_room_link, modality, state, location, topic_arn) 
-  VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+  VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
 `;
 
 const GET_CATEGORY_NAME_BY_ID_QUERY = "SELECT name FROM categories WHERE id = ?";

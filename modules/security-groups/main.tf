@@ -40,7 +40,19 @@ resource "aws_security_group" "sns_endpoint_sg" {
   }
 }
 
-# 2. Create the rules for the SGs
+# ======== Event Bridge VPC Endpoint SG ========
+resource "aws_security_group" "events_endpoint_sg" {
+  name        = var.events_endpoint_sg_name
+  description = "Security Group for EventBridge VPC Endpoint"
+  vpc_id      = var.vpc_id
+
+  tags = {
+    Name = var.events_endpoint_sg_name
+  }
+}
+
+
+###################### Security Groups Rules ######################
 
 # ================= Lambda SG Rules =================
 resource "aws_security_group_rule" "s3gateway_to_lambda" {
@@ -79,8 +91,18 @@ resource "aws_security_group_rule" "lambda_to_sns_endpoint" {
   to_port           = 443
   protocol          = "tcp"
   security_group_id = aws_security_group.lambda_sg.id
-  cidr_blocks       = ["0.0.0.0/0"]
+  source_security_group_id = aws_security_group.sns_endpoint_sg.id  # Cambiar a esto
   description       = "Allow outbound HTTPS traffic from Lambda to SNS Endpoint"
+}
+
+resource "aws_security_group_rule" "lambda_to_events" {
+  type              = "egress"
+  from_port         = 443
+  to_port           = 443
+  protocol          = "tcp"
+  security_group_id = aws_security_group.lambda_sg.id
+  cidr_blocks       = ["0.0.0.0/0"]
+  description       = "Allow outbound HTTPS traffic from Lambda to EventBridge"
 }
 
 # ================= RDS Proxy SG Rules =================
@@ -124,4 +146,45 @@ resource "aws_security_group_rule" "sns_endpoint_from_lambda" {
   security_group_id = aws_security_group.sns_endpoint_sg.id
   source_security_group_id = aws_security_group.lambda_sg.id
   description       = "Allow inbound HTTPS traffic from Lambda to SNS Endpoint"
+}
+
+resource "aws_security_group_rule" "sns_endpoint_egress" {
+  type              = "egress"
+  from_port         = 0
+  to_port           = 0
+  protocol          = "-1"
+  security_group_id = aws_security_group.sns_endpoint_sg.id
+  cidr_blocks       = ["0.0.0.0/0"]
+  description       = "Allow all outbound traffic from SNS endpoint"
+}
+
+# ================= Event Bridge Endpoint SG Rules =================
+resource "aws_security_group_rule" "events_endpoint_from_lambda" {
+  type              = "ingress"
+  from_port         = 443
+  to_port           = 443
+  protocol          = "tcp"
+  security_group_id = aws_security_group.events_endpoint_sg.id
+  source_security_group_id = aws_security_group.lambda_sg.id
+  description       = "Allow inbound HTTPS traffic from Lambda to EventBridge Endpoint"
+}
+
+resource "aws_security_group_rule" "lambda_to_events_endpoint" {
+  type                     = "egress"
+  from_port                = 443
+  to_port                  = 443
+  protocol                 = "tcp"
+  security_group_id        = aws_security_group.lambda_sg.id
+  source_security_group_id = aws_security_group.events_endpoint_sg.id
+  description             = "Allow outbound HTTPS traffic from Lambda to EventBridge endpoint"
+}
+
+resource "aws_security_group_rule" "events_endpoint_egress" {
+  type              = "egress"
+  from_port         = 0
+  to_port           = 0
+  protocol          = "-1"
+  security_group_id = aws_security_group.events_endpoint_sg.id
+  cidr_blocks       = ["0.0.0.0/0"]
+  description       = "Allow all outbound traffic from EventBridge endpoint"
 }

@@ -41,8 +41,11 @@ module "vpc_endpoints" {
     // the sns endpoint is an Interface endpoint (it creates an ENI in the subnet)
     // and it is private (no public DNS)
     sns = {
-      service             = "sns"
-      subnets             = data.aws_subnets.lambdas_subnets.ids
+      service = "sns"
+      subnet_ids = [
+        module.vpc.private_subnets[0], # Usa solo private-subnet-1 de us-east-1a
+        module.vpc.private_subnets[1]  # Usa solo private-subnet-2 de us-east-1b
+      ]
       vpc_endpoint_type   = "Interface"
       private_dns_enabled = true
       security_group_ids  = [module.security_groups.sns_endpoint_sg_id]
@@ -59,6 +62,27 @@ module "vpc_endpoints" {
       })
       tags = {
         Name = var.vpc_endpoint_sns_name
+      }
+    },
+    events = {
+      service             = "events"
+      vpc_endpoint_type   = "Interface"
+      subnet_ids          = [module.vpc.private_subnets[0], module.vpc.private_subnets[1]] # Una subnet por AZ
+      private_dns_enabled = true
+      security_group_ids  = [module.security_groups.events_endpoint_sg_id]
+      policy = jsonencode({
+        Version = "2008-10-17"
+        Statement = [
+          {
+            Effect    = "Allow"
+            Principal = "*"
+            Action    = "*"
+            Resource  = "*"
+          }
+        ]
+      })
+      tags = {
+        Name = "events-vpc-endpoint"
       }
     }
   }
@@ -89,11 +113,12 @@ module "s3_images" {
 module "security_groups" {
   source = "./modules/security-groups"
 
-  lambda_sg_name   = var.lambda_sg_name
-  rdsproxy_sg_name = var.rds_proxy_sg_name
-  mysql_sg_name    = var.my_sql_sg_name
-  sns_endpoint_sg_name = var.sns_endpoint_sg_name
-  vpc_id           = module.vpc.id
+  lambda_sg_name          = var.lambda_sg_name
+  rdsproxy_sg_name        = var.rds_proxy_sg_name
+  mysql_sg_name           = var.my_sql_sg_name
+  sns_endpoint_sg_name    = var.sns_endpoint_sg_name
+  events_endpoint_sg_name = var.events_endpoint_sg_name
+  vpc_id                  = module.vpc.id
 
 }
 
@@ -120,10 +145,10 @@ module "rds_mysql" {
 # ================ Cognito =====================
 module "cognito" {
   source = "./modules/cognito"
-  
-  domain          = "${var.cognito_domain}-${random_string.random_suffix.result}"
-  user_pool_name  = var.user_pool_name
-  google_client_id = var.google_client_id
+
+  domain               = "${var.cognito_domain}-${random_string.random_suffix.result}"
+  user_pool_name       = var.user_pool_name
+  google_client_id     = var.google_client_id
   google_client_secret = var.google_client_secret
 }
 
@@ -186,20 +211,20 @@ module "lambda_functions" {
   vpc_security_group_ids = contains(["createUser", "getUserById", "editUser", "putUserImg"], each.value.name) ? [] : [module.security_groups.lambda_sg_id]
 
   environment_variables = {
-    RDS_HOST       = module.rds_mysql.proxy_endpoint
-    DB_USERNAME    = var.rds_db_username
-    DB_PASSWORD    = var.rds_db_password
-    DB_NAME        = var.rds_db_name
-    S3_BUCKET_NAME = "${var.images_bucket_name}-${random_string.random_suffix.result}"
-    USER_POOL_ID   = module.cognito.id
-    CLIENT_ID      = module.cognito.client_id
+    RDS_HOST             = module.rds_mysql.proxy_endpoint
+    DB_USERNAME          = var.rds_db_username
+    DB_PASSWORD          = var.rds_db_password
+    DB_NAME              = var.rds_db_name
+    S3_BUCKET_NAME       = "${var.images_bucket_name}-${random_string.random_suffix.result}"
+    USER_POOL_ID         = module.cognito.id
+    CLIENT_ID            = module.cognito.client_id
     LAMBDA_SNS_PUBLISHER = values(local.sns_lambda_functions_arn)[0]
   }
 }
 
 
 resource "null_resource" "invoke_db" {
-  depends_on = [ module.lambda_functions, module.rds_mysql ]
+  depends_on = [module.lambda_functions, module.rds_mysql]
 
   provisioner "local-exec" {
     command = "aws lambda invoke --function-name ${module.lambda_functions["setupDB"].function_name} response.json"
@@ -247,7 +272,7 @@ resource "aws_lambda_permission" "api_gateway_lambda" {
 # =============== Frontend Build =====================
 
 resource "null_resource" "api-gateway-url" {
-  depends_on = [ module.api_gateway ]
+  depends_on = [module.api_gateway]
   provisioner "local-exec" {
     command = "./set-api-gw.sh ${module.api_gateway.invoke_url}"
   }
@@ -257,7 +282,7 @@ resource "null_resource" "api-gateway-url" {
 }
 
 resource "null_resource" "client_id" {
-  depends_on = [ module.cognito ]
+  depends_on = [module.cognito]
   provisioner "local-exec" {
     command = "./set-client-id.sh ${module.cognito.client_id}"
   }
@@ -267,10 +292,10 @@ resource "null_resource" "client_id" {
 }
 
 resource "null_resource" "frontend_build" {
-  depends_on = [ null_resource.api-gateway-url, module.s3_frontend, null_resource.client_id ]
+  depends_on = [null_resource.api-gateway-url, module.s3_frontend, null_resource.client_id]
 
   provisioner "local-exec" {
-    command = "npm install && npm run build"
+    command     = "npm install && npm run build"
     working_dir = local.frontend_directory
   }
   triggers = {
@@ -279,15 +304,15 @@ resource "null_resource" "frontend_build" {
 }
 
 resource "aws_s3_object" "file" {
-    depends_on = [ null_resource.frontend_build ]
+  depends_on = [null_resource.frontend_build]
 
-    for_each = fileset(local.build_directory, "**")
+  for_each = fileset(local.build_directory, "**")
 
-    bucket = module.s3_frontend.bucket_id
-    key    = each.value
-    source = "${local.build_directory}/${each.value}"
-    etag   = filemd5("${local.build_directory}/${each.value}")
+  bucket = module.s3_frontend.bucket_id
+  key    = each.value
+  source = "${local.build_directory}/${each.value}"
+  etag   = filemd5("${local.build_directory}/${each.value}")
 
-    content_type = lookup(local.mime_types, concat(regexall("([^\\.]*)$", each.value), [[""]])[0][0], "")
+  content_type = lookup(local.mime_types, concat(regexall("([^\\.]*)$", each.value), [[""]])[0][0], "")
 }
 
