@@ -1,5 +1,6 @@
 output "resources" {
   value = {
+    google_log_in  = aws_api_gateway_resource.google_log_in.id,
     users          = aws_api_gateway_resource.users.id
     user_id        = aws_api_gateway_resource.user_id.id
     user_events    = aws_api_gateway_resource.user_events.id
